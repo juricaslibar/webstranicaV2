@@ -22,23 +22,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session setup 
+// Session setup
 app.use(session({
-    secret: process.env.EMAIL_SECRET || 'your-secret-key',
+    secret: 'your-secret-key', // Change this to a strong secret
     resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost:27017/sessiondb',
-        collectionName: 'sessions',
-        ttl: 14 * 24 * 60 * 60, // 14 days
-        autoRemove: 'native',
-    }),
-    cookie: {
-        secure: process.env.NODE_ENV === 'production', // Secure cookies in production
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    }
-}));
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+})); 
 
 // Create data directory if it doesn't exist
 const DATA_DIR = './data';
