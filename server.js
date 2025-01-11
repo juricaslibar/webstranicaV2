@@ -651,10 +651,7 @@ app.get('/complete1', async (req, res) => {
             stripe.checkout.sessions.listLineItems(req.query.session_id)
         ]);
 
-<<<<<<< HEAD
-=======
     console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
->>>>>>> ce79962be2adc503e2721e8d74f70abb71fd7b17
         // Log the session and line items details
         console.log("Session Details:", {
             id: session.id,
