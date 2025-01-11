@@ -12,9 +12,6 @@ const path = require('path');
 const crypto = require('crypto');
 const session = require('express-session'); 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-const MongoStore = require('connect-mongo');
-const mongoose = require('mongoose');
-
 
 const app = express(); 
 
