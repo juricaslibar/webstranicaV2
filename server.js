@@ -22,11 +22,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/sessiondb', {
-}).then(() => console.log('Connected to MongoDB for session storage'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
 // Session setup 
 app.use(session({
     secret: process.env.EMAIL_SECRET || 'your-secret-key',
@@ -57,13 +52,13 @@ if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify({}), 'utf8');
 }
 
-// Encryption setup
-const ENCRYPTION_KEY = crypto.randomBytes(32); // Store this securely in a real application
+// Encryption setup 
+const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
 const IV_LENGTH = 16;
 
 // Function to encrypt data
 const encrypt = (text) => {
-    const iv = crypto.randomBytes(IV_LENGTH);
+    const iv = crypto.randomBytes(IV_LENGTH); 
     const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -141,12 +136,13 @@ passport.use(
             try {
                 const users = readUsers();
                 const email = profile.emails[0].value; // Extract user's email
-                const userId = profile.name.givenName + "@google";
+                const userId = email + "@google";
 
                 // Ensure user exists in the system
                 if (!users[userId]) {
                     // Create new user for Google login
                     users[userId] = {
+                        name: profile.name.givenName,
                         email,
                         password: null, // Not applicable for Google login
                         registrationDate: new Date().toISOString(),
@@ -289,7 +285,6 @@ app.post('/api/register', async (req, res) => {
 
         // Get client info and create first device
         const { ip, userAgent } = getClientInfo(req);
-        const deviceId = generateDeviceId(ip);
         const encryptedIP = encrypt(ip);
 
         // Hash password
@@ -297,6 +292,7 @@ app.post('/api/register', async (req, res) => {
 
         // Store user with first device
         users[username] = {
+            name: username,
             email,
             password: hashedPassword,
             registrationDate: new Date().toISOString(),
@@ -304,7 +300,7 @@ app.post('/api/register', async (req, res) => {
             isSubscribed1: false,
             isSubscribed2: false,
             devices: {
-                [deviceId]: {
+                [0]: {
                     ip: encryptedIP,
                     userAgent,
                     lastUsed: new Date().toISOString(),
@@ -325,26 +321,34 @@ app.post('/api/register', async (req, res) => {
 
         // Send confirmation email
         transporter.sendMail({
+            from: '"Stat&Mat" <your-email@gmail.com>',
             to: email,
             subject: 'Potvrda e-mail adrese',
             html: `
-    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <img src="${process.env.BASE_URL}/public/sprites/logo.ico" style="max - width: 150px; ">
-        </div>
-        <h2 style="text-align: center; color: #007bff;">Potvrdite svoju e-mail adresu</h2>
-        <p>Poštovani,</p>
-        <p>Hvala što ste se registrirali! Kako bismo dovršili postupak registracije, molimo Vas da potvrdite svoju e-mail adresu klikom na donji gumb:</p>
-        <div style="text-align: center; margin: 20px 0;">
-            <a href="${url}" style="background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px;">Potvrdi e-mail</a>
-        </div>
-        <p>Ako ne možete kliknuti na gumb, kopirajte i zalijepite sljedeći link u svoj preglednik:</p>
-        <p style="word-break: break-word; text-align: center; color: #555;">${url}</p>
-        <p>Za dodatne informacije slobodno nas kontaktirajte.</p>
-        <p>S poštovanjem,</p>
-        <p><strong>Vaš Tim</strong></p>
+<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="cid:logo" style="max-width: 150px;">
     </div>
-    `
+    <h2 style="text-align: center; color: #007bff;">Potvrdite svoju e-mail adresu</h2>
+    <p>Poštovani,</p>
+    <p>Hvala što ste se registrirali! Kako bismo dovršili postupak registracije, molimo Vas da potvrdite svoju e-mail adresu klikom na donji gumb:</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="${url}" style="background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px;">Potvrdi e-mail</a>
+    </div>
+    <p>Ako ne možete kliknuti na gumb, kopirajte i zalijepite sljedeći link u svoj preglednik:</p>
+    <p style="word-break: break-word; text-align: center; color: #555;">${url}</p>
+    <p>Za dodatne informacije slobodno nas kontaktirajte.</p>
+    <p>S poštovanjem,</p>
+    <p><strong>Vaš Tim</strong></p>
+</div>
+`,
+            attachments: [
+                {
+                    filename: 'logo.ico',
+                    path: './public/sprites/logo.ico', // Path to the logo file
+                    cid: 'logo' // Same as the cid used in the img src
+                }
+            ]
         });
 
         // Send JSON response first
@@ -413,9 +417,34 @@ app.post('/resend-email', async (req, res) => {
 
         // Send confirmation email
         await transporter.sendMail({
+            from: '"Stat&Mat" <your-email@gmail.com>',
             to: email,
-            subject: 'Confirm Email',
-            html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`
+            subject: 'Potvrda e-mail adrese',
+            html: `
+<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="cid:logo" style="max-width: 150px;">
+    </div>
+    <h2 style="text-align: center; color: #007bff;">Potvrdite svoju e-mail adresu</h2>
+    <p>Poštovani,</p>
+    <p>Hvala što ste se registrirali! Kako bismo dovršili postupak registracije, molimo Vas da potvrdite svoju e-mail adresu klikom na donji gumb:</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="${url}" style="background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px;">Potvrdi e-mail</a>
+    </div>
+    <p>Ako ne možete kliknuti na gumb, kopirajte i zalijepite sljedeći link u svoj preglednik:</p>
+    <p style="word-break: break-word; text-align: center; color: #555;">${url}</p>
+    <p>Za dodatne informacije slobodno nas kontaktirajte.</p>
+    <p>S poštovanjem,</p>
+    <p><strong>Vaš Tim</strong></p>
+</div>
+`,
+            attachments: [
+                {
+                    filename: 'logo.ico',
+                    path: './public/sprites/logo.ico', // Path to the logo file
+                    cid: 'logo' // Same as the cid used in the img src
+                }
+            ]
         });
 
         res.json({
@@ -462,64 +491,44 @@ app.post('/api/login', async (req, res) => {
 
         const { ip, userAgent } = getClientInfo(req);
         const user = users[username];
-        const devices = user.devices || {};
+        const devices = user.devices;
 
-        // Check if this is a known device
-        if (deviceId && devices[deviceId]) {
-            // Update existing device
-            devices[deviceId].lastUsed = new Date().toISOString();
-            devices[deviceId].ip = encrypt(ip);
-            devices[deviceId].userAgent = userAgent;
+        // Check existing devices
+        const deviceKeys = Object.keys(devices);
 
-            users[username].devices = devices;
-            writeUsers(users);
+        if (deviceKeys.length == 1) {
+            // Second device
+            if (decrypt(devices[0].ip) == ip && devices[0].userAgent == userAgent) {
+                devices[0].lastUsed = new Date().toISOString();
+            } else {
+                devices[deviceKeys.length] = {
+                    ip: encrypt(ip),
+                    userAgent,
+                    lastUsed: new Date().toISOString(),
+                };
+            }
+        } else {
+            if (decrypt(devices[0].ip) == ip && devices[0].userAgent == userAgent) {
+                devices[0].lastUsed = new Date().toISOString();
+            }
+            else if (decrypt(devices[1].ip) == ip && devices[1].userAgent == userAgent) {
+                devices[1].lastUsed = new Date().toISOString();
+            } else {
+                return res.status(400).json({
+                    error: 'Maximum device limit reached',
+                    message: 'You have reached the maximum number of devices (2) for this account.',
+                    devices: deviceList });
+            }            
+        }
 
-            
-
+        writeUsers(users);
             req.session.username = username; // Store username in session
             return res.json({
                 message: 'Login successful',
                 redirect: '/',
                 deviceId
             });
-        } else {
-            // Check number of registered devices
-            const deviceCount = Object.keys(devices).length;
-
-            if (deviceCount >= 2) {
-                // Get device details for the error message
-                const deviceList = Object.entries(devices).map(([, device]) => {
-                    return {
-                        userAgent: device.userAgent,
-                        lastUsed: new Date(device.lastUsed).toLocaleString()
-                    };
-                });
-
-                return res.status(400).json({
-                    error: 'Maximum device limit reached',
-                    message: 'You have reached the maximum number of devices (2) for this account.',
-                    devices: deviceList
-                });
-            }
-
-            // Add new device if under limit
-            const newDeviceId = generateDeviceId(ip);
-            devices[newDeviceId] = {
-                ip: encrypt(ip),
-                userAgent,
-                lastUsed: new Date().toISOString(),
-            };
-
-            users[username].devices = devices;
-            writeUsers(users);
-
-            req.session.username = username; // Store username in session
-            res.json({
-                message: 'Login successful',
-                redirect: '/',
-                deviceId: newDeviceId
-            });
-        }
+        
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Server error' });
@@ -656,9 +665,6 @@ app.get('/complete1', async (req, res) => {
             stripe.checkout.sessions.listLineItems(req.query.session_id)
         ]);
 
-<<<<<<< HEAD
-    console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
-=======
         // Log the session and line items details
         console.log("Session Details:", {
             id: session.id,
@@ -671,7 +677,6 @@ app.get('/complete1', async (req, res) => {
                 amount: item.amount_total,
             })),
         });
->>>>>>> e28f1def10979dfde23bceb15686c618423dd67d
 
     const username = req.session.username;
     if (!username) {
@@ -681,6 +686,92 @@ app.get('/complete1', async (req, res) => {
     const user = users[username];
     user.isSubscribed1 = true;  // Set the subscription status to true
     writeUsers(users); 
+
+    // Send email
+    const mailOptions = {
+        from: '"Stat&Mat" <your-email@gmail.com>',
+        to: user.email,
+        subject: 'Zahvaljujemo na kupovini!',
+        html: `<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zahvalnica za kupovinu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 80px;
+            height: auto;
+        }
+        .content {
+            text-align: left;
+        }
+        .content h1 {
+            color: #333333;
+            font-size: 24px;
+        }
+        .content p {
+            color: #555555;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="cid:logo.ico" alt="Logo">
+        </div>
+        <div class="content">
+            <h1>Hvala Vam na kupovini!</h1>
+            <p>Poštovani/a,</p>
+            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - prvi kolokvij"</strong>.</p>
+            <p>Želimo Vam puno uspjeha u učenju i savladavanju gradiva.</p>
+            <p>Ako imate dodatnih pitanja, slobodno nas kontaktirajte putem e-maila ili telefona.</p>
+            <p>Srdačan pozdrav,</p>
+            <p><strong>Vaš Tim</strong></p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Vaša Tvrtka. Sva prava pridržana.</p>
+        </div>
+    </div>
+</body>
+</html>`,
+        attachments: [
+            {
+                filename: 'logo.ico',
+                path: './public/sprites/logo.ico',
+                cid: 'logo.ico' // CID mora odgovarati src u HTML-u
+            }
+        ]
+    };
+
+    transporter.sendMail(mailOptions);
 
     res.send(`
             <!DOCTYPE html>
