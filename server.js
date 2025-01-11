@@ -633,12 +633,12 @@ app.post('/checkout1', ensureLoggedIn, async (req, res) => {
 })
 
 app.get('/complete1', async (req, res) => {
-    const result = Promise.all([
+    const result = await Promise.all([
         stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
         stripe.checkout.sessions.listLineItems(req.query.session_id)
     ])
 
-    console.log(JSON.stringify(await result))
+    console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
 
     const username = req.session.username;
     if (!username) {
