@@ -1,0 +1,496 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stat & Mat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --menu-bg-color: white;
+            --menu-border-color: #e2e8f0;
+            --border-color: #e2e8f0;
+            --card-bg-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        header {
+            background: var(--menu-bg-color);
+            padding: 1rem;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo-image {
+            height: 50px; /* Adjust as needed */
+            vertical-align: middle; /* Align with text */
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+            nav a {
+                text-decoration: none;
+                font-weight: 500;
+                color: var(--text-color);
+                transition: color 0.2s, transform 0.2s;
+                padding: 0.5rem 0.6rem;
+                border-radius: 0.5rem;
+            }
+
+                nav a:hover {
+                    background: var(--primary-color);
+                    color: white;
+                    transform: scale(1.05);
+                }
+
+        .hero {
+            margin-top: 9rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: var(--primary-color); /* Fallback color for better contrast */
+            background-image: url('/sprites/hero.background.jpg');
+            background-size: contain; /* Prevent stretching */
+            background-position: center; /* Keep the image in the center */
+            background-repeat: no-repeat; /* Avoid repeating the image */
+            color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            min-height: 300px; /* Set a minimum height to create enough space for the image */
+        }
+
+            .hero h1 {
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+            .hero p {
+                font-size: 1.25rem;
+                margin-bottom: 2rem;
+            }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .hero button {
+            padding: 0.75rem 2rem;
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            height: 50px;
+        }
+
+            .hero button:hover {
+                background: var(--secondary-color );
+                color: white;
+                transform: scale(1.05);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            }
+
+        .info-section {
+            padding: 2rem;
+            padding-top: 150px;
+            background: var(--card-bg-color);
+            margin-top: 2rem;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            border-radius: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+            .info-section:hover {
+                transform: translateY(-2px);
+            }
+
+            .info-section h2 {
+                text-align: center;
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+            .info-section p {
+                text-align: center;
+                font-size: 1.125rem;
+                margin-bottom: 1rem;
+                line-height: 1.6;
+            }
+
+            .info-section ul {
+                list-style-type: none;
+                padding: 0;
+                text-align: center;
+            }
+
+            .info-section li {
+                margin: 0.5rem 0;
+                font-size: 1.125rem;
+            }
+
+        .math-section {
+            padding: 2rem;
+            background: var(--card-bg-color);
+            margin-top: 2rem;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            border-radius: 0.5rem;
+        }
+
+            .math-section h2 {
+                text-align: center;
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+        .register-link {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            height: 50px;
+            text-decoration: none;
+        }
+
+            .register-link:hover {
+                background: var(--secondary-color);
+                color: white;
+                transform: scale(1.05);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--menu-bg-color);
+            margin-top: 2rem;
+            box-shadow: 0 -1px 3px var(--shadow-color);
+        }
+
+            footer p {
+                margin: 0.5rem 0;
+            }
+
+            footer a {
+                color: var(--primary-color);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .hero {
+                background-image: none; /* Remove the background image */
+            }
+
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .info-section h2, .math-section h2 {
+                font-size: 1.75rem;
+            }
+
+            .info-section p, .info-section li {
+                font-size: 1rem;
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Menu -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">
+                <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
+                Stat&Mat
+            </a>
+            <nav>
+                <a href="#Onama">O nama</a>
+                <a href="/register" id="register-link">Registracija</a>
+                <a href="/login" id="login-link">Prijava</a>
+                <a href="#contact">Kontakt</a>
+                <a href="/Matematika_prvi_kol" id="Matematika_prvi_kol-link" style="display: none;">Matematika - prvi kolokvij</a>
+                <a href="/Matematika_drugi_kol" id="Matematika_drugi_kol-link" style="display: none;">Matematika - drugi kolokvij</a>
+                <a href="/logout" id="logout-link" style="display: none;">Odjava</a>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- Hero Section -->
+    <div class="hero" style="margin-bottom: 50px;">
+        <h1 id="hero-title">Dobrodošli na Stat&Mat</h1>
+        <p>Unaprijedite svoje znanje već danas!</p>
+        <div class="button-container" id="create-account-button">
+            <a href="/register" class="register-link hero-button">Napravite račun</a>
+        </div>
+    </div>
+
+    <!-- Subscription Plans Section -->
+    <div class="subscription-container" style="display: flex; justify-content: center; gap: 20px; margin-top: 30px; flex-wrap: wrap;">
+        <!-- Plan 1 -->
+        <div class="plan-box" style="background-color: #f5faff; border: 2px solid #2196F3; border-radius: 10px; padding: 20px; width: 350px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #2196F3; font-size: 20px; margin-bottom: 15px;">Matematika - prvi kolokvij</h3>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Matrice</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Funkcije jedne varijable</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 115px;">(xy sati materijala/broj videa)</p>
+            <button onclick="window.location.href='/Matematika1'"
+                    style="font-size: 17px; background-color: #2196F3; color: white; padding: 13px 100px; border: none; border-radius: 25px; cursor: pointer; font-family: 'Arial', sans-serif; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;">
+                Saznaj više
+            </button>
+        </div>
+
+        <!-- Plan 2 -->
+        <div class="plan-box" style="background-color: #f5faff; border: 2px solid #2196F3; border-radius: 10px; padding: 20px; width: 350px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #2196F3; font-size: 20px; margin-bottom: 15px;">Matematika - drugi kolokvij</h3>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Funkcije više varijabli</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Integrali</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Financijska matematika</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 90px;">(xy sati materijala/broj videa)</p>
+            <button onclick="window.location.href='/Matematika2'"
+                    style="font-size: 17px; background-color: #2196F3; color: white; padding: 13px 100px; border: none; border-radius: 25px; cursor: pointer; font-family: 'Arial', sans-serif; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;">
+                Saznaj više
+            </button>
+        </div>
+
+        <!-- Plan 3 -->
+        <div class="plan-box" style="background-color: #f5faff; border: 2px solid #2196F3; border-radius: 10px; padding: 20px; width: 350px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #2196F3; font-size: 20px; margin-bottom: 15px;">Statistika - prvi kolokvij</h3>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Numerički niz</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Distribucija frekvencija</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Nominalni niz</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Mjere koncentracije</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Vjerojatnost</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Vremenski niz</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 20px;">(xy sati materijala/broj videa)</p>
+            <button onclick="window.location.href='/Matematika1'"
+                    style="font-size: 17px; background-color: #2196F3; color: white; padding: 13px 100px; border: none; border-radius: 25px; cursor: pointer; font-family: 'Arial', sans-serif; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;">
+                Saznaj više
+            </button>
+        </div>
+
+        <!-- Plan 4 -->
+        <div class="plan-box" style="background-color: #f5faff; border: 2px solid #2196F3; border-radius: 10px; padding: 20px; width: 350px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #2196F3; font-size: 20px; margin-bottom: 15px;">Statistika- drugi kolokvij</h3>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Procjena parametra</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Regresija</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 2px;">Trend modeli</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 90px;">(xy sati materijala/broj videa)</p>
+            <button onclick="window.location.href='/Matematika1'"
+                    style="font-size: 17px; background-color: #2196F3; color: white; padding: 13px 100px; border: none; border-radius: 25px; cursor: pointer; font-family: 'Arial', sans-serif; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;">
+                Saznaj više
+            </button>
+        </div>
+    </div>
+
+    <!-- Key Information Section -->
+    <section id="Onama" class="info-section" style="padding-top: 0;">
+        <h2>O nama</h2>
+        <p>
+            Mi smo Jurica i Martin, studenti FER-a i FSB-a. Naša strast prema matematici i statistici, kao i želja da pomognemo kolegama, inspirirali su nas da pokrenemo ovu web stranicu. Naša misija je jednostavna: pomoći studentima Ekonomskog fakulteta (i svim drugim studentima koji se susreću s matematikom i statistikom) da lakše i efikasnije savladaju ove ključne discipline. Stranica nudi brojne lekcije, prilagođene zadatke i detaljna objašnjenja koja pokrivaju osnovne i napredne matematičke pojmove. Naša stranica je dizajnirana tako da korisnici mogu učiti u svom tempu, uz podršku i savjete koji će im pomoći da savladaju izazove s kojima se susrecu tijekom studija. U kontinuiranom kontaktu smo sa studentima koji pohađaju ove kolegije, tako da znamo što se od Vas očekuje.
+        </p>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="info-section" style="padding-top: 0;">
+        <h2>Što možete očekivati?</h2>
+        <p>Osim samih videolekcija nudimo i druge načine pomaganje studentima:</p>
+        <ul>
+            <li>Objašnjavanje zadataka putem maila</li>
+            <li>Riješavanje zadataka koji nisu riješeni na portalu </li>
+        </ul>
+    </section>
+
+    <section id="kontakt" class="info-section" style="padding-top: 0;">
+        <h2>Kontakt</h2>
+        <p>We offer a wide range of features designed to enhance your learning experience:</p>
+        <ul>
+            <li>Expert-created courses tailored to your needs</li>
+            <li>Interactive community support and peer learning</li>
+            <li>Certificates to showcase your accomplishments</li>
+        </ul>
+    </section>
+    <!-- Math Section -->
+    <section class="math-section">
+        <h2>Materijali</h2>
+        <p>Explore some fundamental mathematical concepts:</p>
+        <p>Quadratic Formula: \( x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \)</p>
+        <p>Pythagorean Theorem: \( a^2 + b^2 = c^2 \)</p>
+        <p>Euler's Formula: \( e^{i\pi} + 1 = 0 \)</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Stat&Mat. All rights reserved.</p>
+        <p>
+            <a href="#Onama">O nama</a> |
+            <a href="#features">Features</a> |
+            <a href="#kontakt">Kontakt</a>
+        </p>
+    </footer>
+
+
+    <script>
+        // Check if user is logged in
+        fetch('/api/check-login')
+            .then(response => response.json())
+            .then(data => {
+                if (data.loggedIn) {
+                    const username = data.username; // Access the username
+                    document.querySelector('.hero h1').textContent = `Dobrodošli natrag, ${username}`;
+                    document.querySelector('.register-link').style.display = 'none'; // Hide "Create an Account" button
+                    document.getElementById('logout-link').style.display = 'inline';
+                    document.getElementById('login-link').style.display = 'none';
+                    document.getElementById('register-link').style.display = 'none';
+
+                    //check if user is subscribed to Matematika - prvi kol
+                    fetch('/api/subscription-status1')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch subscription status');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.isSubscribed1) {
+                                document.getElementById('Matematika_prvi_kol-link').style.display = 'inline';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                    //check if user is subscribed to Matematika - drugi kol
+                    fetch('/api/subscription-status2')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch subscription status');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.isSubscribed2) {
+                                document.getElementById('Matematika_drugi_kol-link').style.display = 'inline';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                }
+
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
+            });
+
+        // Logout function
+        document.getElementById('logout-link').addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default anchor behavior
+
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Successfully logged out
+                        alert('Logout successful!'); // Optional: Show a message
+                        window.location.href = '/'; // Redirect to the home page
+                    } else {
+                        // Handle error
+                        alert('Logout failed. Please try again.');
+                    }
+                })
+                .catch(error => console.error('Error during logout:', error));
+        })
+    </script>
+</body>
+</html>

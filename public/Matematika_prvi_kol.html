@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matematika - prvi kolokvij</title>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+    <link href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --menu-bg-color: white;
+            --menu-border-color: #e2e8f0;
+            --card-bg-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --hero-bg-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--menu-bg-color);
+            padding: 1rem;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo-image {
+            height: 50px; /* Adjust as needed */
+            vertical-align: middle; /* Align with text */
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+            nav a {
+                text-decoration: none;
+                font-weight: 500;
+                color: var(--text-color);
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                transition: background 0.2s, color 0.2s;
+            }
+
+                nav a:hover {
+                    background: var(--primary-color);
+                    color: white;
+                }
+
+        .hero {
+            margin-top: 6rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: var(--hero-bg-gradient);
+            color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+
+            .hero h1 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+            .hero p {
+                font-size: 1.25rem;
+                margin-bottom: 2rem;
+            }
+
+            .hero .register-link {
+                padding: 0.75rem 2rem;
+                background: white;
+                color: var(--primary-color);
+                border: none;
+                border-radius: 0.5rem;
+                font-size: 1.125rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s, color 0.2s;
+                box-shadow: 0 2px 5px var(--shadow-color);
+                height: 50px;
+            }
+
+                .hero .register-link:hover {
+                    background: var(--secondary-color);
+                    color: white;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                }
+
+        .video-menu {
+            margin-top: 6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .video-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .video-item {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+            .video-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .video-title {
+            padding: 10px;
+            text-align: center;
+            background-color: #f9fafb;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        footer {
+            background-color: var(--menu-bg-color);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 -1px 3px var(--shadow-color);
+            margin-top: 4rem;
+        }
+
+            footer p {
+                margin: 0.5rem 0;
+            }
+
+            footer a {
+                color: var(--primary-color);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .video-section {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header with Menu -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">
+                <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
+                Stat & Mat
+            </a>
+            <nav>
+                <a href="#action">Action</a>
+                <a href="#comedy">Comedy</a>
+                <a href="#documentary">Documentary</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Matematika - prvi kolokvij</h1>
+        <p>Your favorite place for action, comedy, and documentaries!</p>
+    </div>
+
+    <!-- Video Menu Section -->
+    <div class="video-menu">
+        <div class="section">
+            <h2 class="section-title">Action Videos</h2>
+            <div class="video-section" id="action">
+                <div class="video-item" onclick="playVideo('video1')">
+                    <img src="https://via.placeholder.com/400x225?text=Action+Video+1" alt="Documentary Video 1" class="video-thumbnail">
+                    <div class="video-title">Title1</div>
+                </div>
+                <!-- Additional video items here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Comedy Videos</h2>
+            <div class="video-section" id="comedy">
+                <div class="video-item">
+                    <img src="https://via.placeholder.com/400x225?text=Comedy+Video+1" alt="Comedy Video 1" class="video-thumbnail">
+                    <div class="video-title">Comedy Video 1</div>
+                </div>
+                <!-- Additional video items here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Documentary Videos</h2>
+            <div class="video-section" id="documentary">
+                <div class="video-item">
+                    <img src="https://via.placeholder.com/400x225?text=Documentary+Video+1" alt="Documentary Video 1" class="video-thumbnail">
+                    <div class="video-title">Documentary Video 1</div>
+                </div>
+                <!-- Additional video items here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 VideoHub. All rights reserved.</p>
+        <p>
+            <a href="#O nama">O nama</a> |
+            <a href="#contact">Contact</a>
+        </p>
+    </footer>
+    <script>
+        // Function to play the selected video when clicked
+        function playVideo(videoFile) {
+            window.location.href = videoFile;
+        }
+    </script>
+
+</body>
+</html>

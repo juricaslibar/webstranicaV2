@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prijava</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --success-color: #059669;
+            --error-color: #dc2626;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo-image {
+            height: 50px; /* Adjust as needed */
+            vertical-align: middle; /* Align with text */
+        }
+
+        .main-container {
+            margin-top: 5rem;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .split-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-section {
+            flex: 1;
+            padding: 3rem;
+            min-width: 320px;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+
+        button {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            button:hover {
+                background: var(--secondary-color);
+            }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            text-align: center;
+            display: none;
+            padding: 0.75rem;
+            background: #ecfdf5;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #64748b;
+        }
+
+            .login-link a {
+                color: var(--primary-color);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .login-link a:hover {
+                    text-decoration: underline;
+                }
+        .social-login {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .or-divider {
+            margin: 1rem 0;
+            color: var(--text-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .google-login-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            background: #ea4335;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%; /* Full width */
+            max-width: 400px; /* Limit width */
+            margin: 0 auto; /* Center alignment */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+            .google-login-btn:hover {
+                background: #c53929;
+                text-decoration: none;
+            }
+
+            .google-login-btn i {
+                margin-right: 0.5rem;
+                font-size: 1.25rem;
+            }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+
+            .divider::before,
+            .divider::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: var(--border-color);
+            }
+
+            .divider::before {
+                margin-right: 0.5rem;
+            }
+
+            .divider::after {
+                margin-left: 0.5rem;
+            }
+
+            .divider span {
+                display: inline-block;
+                background: white; /* Match the form-section background */
+                padding: 0 0.5rem;
+            }
+
+        @media (max-width: 768px) {
+            .info-section {
+                display: none; /* Hide the info section on small screens */
+            }
+
+            .form-section {
+                flex: 1 0 100%; /* Make form section take full width */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
+                Stat&Mat
+            </a>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="split-container">
+            <div class="info-section">
+                <h1>Dobrodošli natrag!</h1>
+                <p>Prijavi se za nastavak učenja!</p>
+            </div>
+
+            <div class="form-section">
+                <h1>Prijava</h1>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="userInput">Korisničko ime ili Email</label>
+                        <input type="text"
+                               id="userInput"
+                               name="userInput"
+                               autocomplete="username"
+                               required>
+                        <div class="error-message" id="userInput-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Lozinka</label>
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               autocomplete="current-password"
+                               required>
+                        <div class="error-message" id="password-error"></div>
+                    </div>
+                    <button type="submit">Prijavi se</button>
+                    <div class="success-message" id="success-message"></div>
+                </form>
+
+                <div class="divider">
+                    <span>ili</span>
+                </div>
+
+                <!-- "Login with Google" button -->
+                <a href="/auth/google" class="google-login-btn">
+                    <i class="fab fa-google"></i> Prijava putem Google-a
+                </a>
+
+                <div class="login-link">
+                    Još uvijek nemaš račun? <a href="/register">Registriraj se</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Function to get device ID from localStorage
+        const getDeviceId = () => localStorage.getItem('deviceId');
+
+        // Function to save device ID to localStorage
+        const saveDeviceId = (deviceId) => localStorage.setItem('deviceId', deviceId);
+
+        // Function to format device info
+        const formatDeviceList = (devices) => {
+            return devices.map(device =>
+                `${device.userAgent}<br>Last used: ${device.lastUsed}`
+            ).join('<br><br>');
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Reset error states
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+            document.getElementById('success-message').style.display = 'none';
+
+            const userInput = document.getElementById('userInput').value.trim();
+            const password = document.getElementById('password').value;
+            const deviceId = getDeviceId();
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userInput, password, deviceId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Save new device ID if provided
+                    if (data.deviceId) {
+                        saveDeviceId(data.deviceId);
+                    }
+
+                    const successMessage = document.getElementById('success-message');
+                    successMessage.textContent = 'Login successful! Redirecting...';
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    const errorDiv = document.getElementById('userInput-error');
+
+                    if (data.error === 'Maximum device limit reached') {
+                        // Create a more detailed error message with device info
+                        let errorMessage = `
+                                    <div class="device-limit-error">
+                                        <p><strong>${data.message}</strong></p>
+                                        <p>Currently registered devices:</p>
+                                        <div class="device-list">
+                                            ${formatDeviceList(data.devices)}
+                                        </div>
+                                        <p>Please use one of your registered devices to log in.</p>
+                                    </div>
+                                `;
+                        errorDiv.innerHTML = errorMessage;
+                    } else {
+                        errorDiv.textContent = data.error;
+                    }
+
+                    errorDiv.style.display = 'block';
+                    document.getElementById('userInput').classList.add('error');
+                    document.getElementById('password').classList.add('error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('password-error').textContent = 'An error occurred. Please try again.';
+                document.getElementById('password-error').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

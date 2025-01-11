@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potvrdi email</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #1e293b;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #resendEmailButton {
+            display: block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        #resendEmailButton:hover {
+            background-color: #1d4ed8;
+        }
+
+        #emailInput {
+            display: block;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #resendStatus {
+            margin-top: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Potvrdi email</h1>
+        <p>Email sa linkom za registraciju vam je poslan na mail.</p>
+        <p>Ne vidite li email, provjerite pretinac za smece</p>
+        <div class="loader"></div>
+        <p>U slucaju da idalje ne vidite email za potvrdu, unesite mail kojim ste se prijavili kako bi vam mogli ponovno poslati mail</p>
+        <input type="email" id="emailInput" placeholder="Enter your email" />
+        <button id="resendEmailButton">Resend Email</button>
+        <div id="resendStatus"></div>
+    </div>
+
+    <script>
+        document.getElementById('resendEmailButton').addEventListener('click', async () => {
+            try {
+                const emailInput = document.getElementById('emailInput');
+                const email = emailInput.value.trim();
+
+                if (!email) {
+                    alert('Please enter your email address.');
+                    return;
+                }
+
+                const response = await fetch('/resend-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ emails: [email] }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message);
+                    emailInput.value = '';  // Clear the input field after success
+                } else {
+                    throw new Error(result.error || 'Something went wrong, please try again later.');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('resendStatus').innerText = error.message;
+            }
+        });
+    </script>
+
+</body>
+</html>
