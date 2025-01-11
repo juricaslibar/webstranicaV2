@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "Jurica@google": {
     "email": "slibar.jurica@gmail.com",
     "password": null,
@@ -15,3 +16,6 @@
     }
   }
 }
+=======
+}
+>>>>>>> e28f1def10979dfde23bceb15686c618423dd67d
