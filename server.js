@@ -540,16 +540,14 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-login', (req, res) => {
+    app.get('/api/check-login', (req, res) => {
+    const users = readUsers();
+    user = users[req.session.username];
+
     if (req.session.username) {
-        if (req.session.username.endsWith("@google")) {
-            return res.status(200).json({
-                loggedIn: true,
-                username: req.session.username.slice(0, -"@google".length) // Include the username in the response
-            });
-        }
         return res.status(200).json({
             loggedIn: true,
-            username: req.session.username // Include the username in the response
+            username: user.name // Include the username in the response
         });
     }
     res.status(401).json({ loggedIn: false });
@@ -651,7 +649,6 @@ app.get('/complete1', async (req, res) => {
             stripe.checkout.sessions.listLineItems(req.query.session_id)
         ]);
 
-    console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
         // Log the session and line items details
         console.log("Session Details:", {
             id: session.id,
