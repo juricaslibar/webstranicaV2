@@ -10,8 +10,11 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const session = require('express-session');
+const session = require('express-session'); 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
+
 
 const app = express(); 
 
@@ -19,13 +22,28 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session setup
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/sessiondb', {
+}).then(() => console.log('Connected to MongoDB for session storage'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+// Session setup 
 app.use(session({
-    secret: process.env.EMAIL_SECRET,
+    secret: process.env.EMAIL_SECRET || 'your-secret-key',
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
-})); 
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: 'mongodb://localhost:27017/sessiondb',
+        collectionName: 'sessions',
+        ttl: 14 * 24 * 60 * 60, // 14 days
+        autoRemove: 'native',
+    }),
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // Secure cookies in production
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
+    }
+}));
 
 // Create data directory if it doesn't exist
 const DATA_DIR = './data';
@@ -204,7 +222,6 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-    console.log("Deserializing user with ID:", id);
     const users = readUsers();
     const user = users[id]; // Retrieve the full user object
     if (user) {
@@ -632,14 +649,14 @@ app.post('/checkout1', ensureLoggedIn, async (req, res) => {
 
     res.redirect(session.url) 
 })
-
+ 
 app.get('/complete1', async (req, res) => {
     const result = Promise.all([
         stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
         stripe.checkout.sessions.listLineItems(req.query.session_id)
     ])
 
-    console.log(JSON.stringify(await result))
+    console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
 
     const username = req.session.username;
     if (!username) {
