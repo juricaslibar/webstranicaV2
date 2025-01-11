@@ -638,7 +638,17 @@ app.get('/complete1', async (req, res) => {
         stripe.checkout.sessions.listLineItems(req.query.session_id)
     ])
 
-    console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
+    console.log("Session Details:", {
+    id: session.id,
+    amount_total: session.amount_total,
+    currency: session.currency,
+    payment_status: session.payment_status,
+    customer_email: session.customer_details?.email,
+    line_items: lineItems.data.map(item => ({
+        description: item.description,
+        amount: item.amount_total,
+    })),
+});
 
     const username = req.session.username;
     if (!username) {
@@ -759,7 +769,17 @@ app.get('/complete2', async (req, res) => {
         stripe.checkout.sessions.listLineItems(req.query.session_id)
     ])
 
-    console.log(JSON.stringify(await result))
+     console.log("Session Details:", {
+    id: session.id,
+    amount_total: session.amount_total,
+    currency: session.currency,
+    payment_status: session.payment_status,
+    customer_email: session.customer_details?.email,
+    line_items: lineItems.data.map(item => ({
+        description: item.description,
+        amount: item.amount_total,
+    })),
+});
 
     const username = req.session.username; 
     if (!username) {
