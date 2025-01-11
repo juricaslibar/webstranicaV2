@@ -1,4 +1,4 @@
-﻿require('dotenv').config()
+require('dotenv').config()
 
 const dotenv = require('dotenv');
 const express = require('express');
@@ -11,7 +11,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const session = require('express-session'); 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 
 const app = express(); 
 
@@ -540,7 +541,6 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-login', (req, res) => {
-    app.get('/api/check-login', (req, res) => {
     const users = readUsers();
     user = users[req.session.username];
 
