@@ -633,22 +633,23 @@ app.post('/checkout1', ensureLoggedIn, async (req, res) => {
 })
 
 app.get('/complete1', async (req, res) => {
-    const result = await Promise.all([
-        stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
-        stripe.checkout.sessions.listLineItems(req.query.session_id)
-    ])
+    const [session, lineItems] = await Promise.all([
+            stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
+            stripe.checkout.sessions.listLineItems(req.query.session_id)
+        ]);
 
-    console.log("Session Details:", {
-    id: session.id,
-    amount_total: session.amount_total,
-    currency: session.currency,
-    payment_status: session.payment_status,
-    customer_email: session.customer_details?.email,
-    line_items: lineItems.data.map(item => ({
-        description: item.description,
-        amount: item.amount_total,
-    })),
-});
+        // Log the session and line items details
+        console.log("Session Details:", {
+            id: session.id,
+            amount_total: session.amount_total,
+            currency: session.currency,
+            payment_status: session.payment_status,
+            customer_email: session.customer_details?.email,
+            line_items: lineItems.data.map(item => ({
+                description: item.description,
+                amount: item.amount_total,
+            })),
+        });
 
     const username = req.session.username;
     if (!username) {
@@ -764,22 +765,23 @@ app.post('/checkout2', ensureLoggedIn, async (req, res) => {
 })
 
 app.get('/complete2', async (req, res) => {
-    const result = Promise.all([
-        stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
-        stripe.checkout.sessions.listLineItems(req.query.session_id)
-    ])
+    const [session, lineItems] = await Promise.all([
+            stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
+            stripe.checkout.sessions.listLineItems(req.query.session_id)
+        ]);
 
-     console.log("Session Details:", {
-    id: session.id,
-    amount_total: session.amount_total,
-    currency: session.currency,
-    payment_status: session.payment_status,
-    customer_email: session.customer_details?.email,
-    line_items: lineItems.data.map(item => ({
-        description: item.description,
-        amount: item.amount_total,
-    })),
-});
+        // Log the session and line items details
+        console.log("Session Details:", {
+            id: session.id,
+            amount_total: session.amount_total,
+            currency: session.currency,
+            payment_status: session.payment_status,
+            customer_email: session.customer_details?.email,
+            line_items: lineItems.data.map(item => ({
+                description: item.description,
+                amount: item.amount_total,
+            })),
+        });
 
     const username = req.session.username; 
     if (!username) {
