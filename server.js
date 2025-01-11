@@ -204,7 +204,6 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-    console.log("Deserializing user with ID:", id);
     const users = readUsers();
     const user = users[id]; // Retrieve the full user object
     if (user) {
