@@ -35,7 +35,6 @@ app.use(express.json());
 app.use(session({
     secret: 'your-secret-key', // Change this to a strong secret
     resave: false,
-<<<<<<< HEAD
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: mongoURI,
@@ -49,11 +48,9 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     }
 }));
-=======
     saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
 })); 
->>>>>>> 0b703b3712508d83171c2e7f00058323ae13a412
 
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
@@ -534,7 +531,6 @@ app.get('/api/check-login', (req, res) => {
     user = users[req.session.username];
 
     if (req.session.username) {
-<<<<<<< HEAD
         let username = req.session.username
         // Check if username ends with '@google' and remove it
         if (username.endsWith('@google')) {
@@ -544,11 +540,9 @@ app.get('/api/check-login', (req, res) => {
         return res.status(200).json({
             loggedIn: true,
             username: username // Return the cleaned username
-=======
         return res.status(200).json({
             loggedIn: true,
             username: user.name // Include the username in the response
->>>>>>> 0b703b3712508d83171c2e7f00058323ae13a412
         });
     }
     res.status(401).json({ loggedIn: false });
