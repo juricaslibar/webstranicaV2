@@ -20,7 +20,7 @@ const cors = require('cors');
 
 // Allow requests from your frontend domain
 app.use(cors({
-    origin: 'https://webstranicav2.onrender.com/main', // Replace with your actual frontend URL
+    origin: 'https://webstranicav2.onrender.com', // Replace with your actual frontend URL
     credentials: true // Allow cookies and credentials
 }));
 
