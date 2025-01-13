@@ -417,7 +417,10 @@
 
     <script>
         // Check if user is logged in
-        fetch('/api/check-login')
+        fetch('/api/check-login', {
+    method: 'GET',
+    credentials: 'include'
+})
             .then(response => response.json())
             .then(data => {
                 if (data.loggedIn) {
