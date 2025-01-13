@@ -1,4 +1,4 @@
-﻿require('dotenv').config()
+require('dotenv').config()
 
 const dotenv = require('dotenv');
 const express = require('express');
@@ -11,11 +11,15 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const session = require('express-session'); 
+<<<<<<< HEAD
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const User = require('./models/user');
 const axios = require('axios'); // CommonJS syntax
+=======
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+>>>>>>> 0b703b3712508d83171c2e7f00058323ae13a412
 
 
 const app = express(); 
@@ -29,12 +33,12 @@ mongoose.connect(mongoURI)
      
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Session setup 
+// Session setup
 app.use(session({
-    secret: process.env.EMAIL_SECRET || 'your-secret-key',
+    secret: 'your-secret-key', // Change this to a strong secret
     resave: false,
+<<<<<<< HEAD
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: mongoURI,
@@ -48,6 +52,11 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     }
 }));
+=======
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+})); 
+>>>>>>> 0b703b3712508d83171c2e7f00058323ae13a412
 
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
@@ -524,7 +533,11 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-login', (req, res) => {
+    const users = readUsers();
+    user = users[req.session.username];
+
     if (req.session.username) {
+<<<<<<< HEAD
         let username = req.session.username
         // Check if username ends with '@google' and remove it
         if (username.endsWith('@google')) {
@@ -534,6 +547,11 @@ app.get('/api/check-login', (req, res) => {
         return res.status(200).json({
             loggedIn: true,
             username: username // Return the cleaned username
+=======
+        return res.status(200).json({
+            loggedIn: true,
+            username: user.name // Include the username in the response
+>>>>>>> 0b703b3712508d83171c2e7f00058323ae13a412
         });
     }
     res.status(401).json({ loggedIn: false });
