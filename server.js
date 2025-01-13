@@ -49,7 +49,8 @@ app.use(session({
         autoRemove: 'native',
     }),
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // Secure cookies in production
+        sameSite: 'lax'
+        secure: true, // Secure cookies in production
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     }
