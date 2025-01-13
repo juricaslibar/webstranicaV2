@@ -56,6 +56,13 @@ app.use(session({
     }
 }));
 
+// Log session creation and cookies
+app.use((req, res, next) => {
+    console.log('Session ID:', req.session.id);
+    console.log('Cookies:', req.cookies);  // Debugging cookies
+    next();
+});
+
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
 const IV_LENGTH = 16;
