@@ -11,7 +11,6 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const session = require('express-session'); 
-<<<<<<< HEAD
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
@@ -19,7 +18,6 @@ const User = require('./models/user');
 const axios = require('axios'); // CommonJS syntax
 =======
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
->>>>>>> 0b703b3712508d83171c2e7f00058323ae13a412
 
 
 const app = express(); 
