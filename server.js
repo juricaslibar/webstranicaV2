@@ -47,9 +47,6 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     }
 }));
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
-})); 
 
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
