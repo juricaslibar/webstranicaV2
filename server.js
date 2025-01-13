@@ -16,7 +16,13 @@ const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const User = require('./models/user');
 const axios = require('axios'); // CommonJS syntax
+const cors = require('cors');
 
+// Allow requests from your frontend domain
+app.use(cors({
+    origin: 'https://webstranicav2.onrender.com/main', // Replace with your actual frontend URL
+    credentials: true // Allow cookies and credentials
+}));
 
 const app = express(); 
 const PORT = process.env.PORT || 3000;
