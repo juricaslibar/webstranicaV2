@@ -431,10 +431,10 @@ app.post('/resend-email', async (req, res) => {
     } 
 });
 
-
 app.post('/api/login', async (req, res) => {
     try {
-        const { userInput, password, deviceId} = req.body;
+        const { userInput, password, deviceId } = req.body;
+
         // Validation
         if (!userInput || !password) {
             return res.status(400).json({ error: 'All fields are required' });
@@ -445,101 +445,68 @@ app.post('/api/login', async (req, res) => {
         const userAgent = req.session ? getClientInfo(req).userAgent : null;
         const encryptedIP = ip ? encrypt(ip) : null;
 
-        User.findOne({
-            $or: [
-                { name: userInput },
-                { email: userInput }
-            ]
-        })
-            .then(present => {
-                if (present == null) {
-                    return res.status(401).json({ error: 'Netočno korisničko ime ili email adresa' });
-                }
-                if (present.password !== password) {
-                    return res.status(401).json({ error: 'Netočna lozinka' });
-                }
-                if (!present.isConfirmed) {
-                    return res.status(401).json({ error: 'Potvrdite email adresu za nastavak' });
-                }
-                const device = present.devices;
-                device.forEach((dev) => {
-                    if (dev && decrypt(dev.ip) != ip && device.length < 2) {
-                        present.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                        present.save();
-                        req.session.username = present.name;
-req.session.save(err => {
-    if (err) {
-        console.error('Error saving session:', err);
-        return res.status(500).json({ error: 'Failed to save session' });
-    }
-    res.json({
-        message: 'Successful login',
-        redirect: '/'
-    });
-});
+        const user = await User.findOne({
+            $or: [{ name: userInput }, { email: userInput }]
+        });
 
-                        return res.json({
-                            message: 'Uspješna prijava',
-                            redirect: '/'
-                        });
-                    }
-                    else if (dev && dev.userAgent != userAgent && device.length < 2) {
-                        present.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                        present.save();
-                        req.session.username = present.name;
-req.session.save(err => {
-    if (err) {
-        console.error('Error saving session:', err);
-        return res.status(500).json({ error: 'Failed to save session' });
-    }
-    res.json({
-        message: 'Successful login',
-        redirect: '/'
-    });
-});
+        if (!user) {
+            return res.status(401).json({ error: 'Netočno korisničko ime ili email adresa' });
+        }
+        if (user.password !== password) {
+            return res.status(401).json({ error: 'Netočna lozinka' });
+        }
+        if (!user.isConfirmed) {
+            return res.status(401).json({ error: 'Potvrdite email adresu za nastavak' });
+        }
 
-                        return res.json({
-                            message: 'Uspješna prijava',
-                            redirect: '/'
-                        });
-                    }
-                    else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
-                        req.session.username = present.name;
-req.session.save(err => {
-    if (err) {
-        console.error('Error saving session:', err);
-        return res.status(500).json({ error: 'Failed to save session' });
-    }
-    res.json({
-        message: 'Successful login',
-        redirect: '/'
-    });
-});
+        const device = user.devices;
+        let sessionSet = false;
 
-                        return res.json({
-                            message: 'Uspješna prijava',
-                            redirect: '/'
-                        });
-                    }
-                }, () => { });
+        // Iterate through devices
+        for (const dev of device) {
+            if (!dev) continue;
 
-                if (req.session.username != present.name) {
-                    return res.status(400).json({
-                        error: 'Maksimalan broj uređaja dostignut',
-                        message: 'Maksimalan broj uređaja (2) dostignut za ovaj račun.',
-                    });
-                }
-                
-            })
-            .catch(err => {
-                console.error(err);
+            if (decrypt(dev.ip) !== ip && device.length < 2) {
+                user.devices.push({ ip: encryptedIP, userAgent });
+                await user.save();
+                req.session.username = user.name;
+
+                await req.session.save(); // Ensure the session is saved
+                sessionSet = true;
+                return res.json({ message: 'Uspješna prijava', redirect: '/' });
+            }
+
+            if (dev.userAgent !== userAgent && device.length < 2) {
+                user.devices.push({ ip: encryptedIP, userAgent });
+                await user.save();
+                req.session.username = user.name;
+
+                await req.session.save(); // Ensure the session is saved
+                sessionSet = true;
+                return res.json({ message: 'Uspješna prijava', redirect: '/' });
+            }
+
+            if (decrypt(dev.ip) === ip && dev.userAgent === userAgent) {
+                req.session.username = user.name;
+
+                await req.session.save(); // Ensure the session is saved
+                sessionSet = true;
+                return res.json({ message: 'Uspješna prijava', redirect: '/' });
+            }
+        }
+
+        if (!sessionSet) {
+            return res.status(400).json({
+                error: 'Maksimalan broj uređaja dostignut',
+                message: 'Maksimalan broj uređaja (2) dostignut za ovaj račun.'
             });
-
+        }
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // Middleware to ensure user is logged in
 function ensureLoggedIn(req, res, next) {
