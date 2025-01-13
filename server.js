@@ -29,10 +29,11 @@ mongoose.connect(mongoURI)
      
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Session setup
+// Session setup 
 app.use(session({
-    secret: 'your-secret-key', // Change this to a strong secret
+    secret: process.env.EMAIL_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -523,9 +524,6 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-login', (req, res) => {
-    const users = readUsers();
-    user = users[req.session.username];
-
     if (req.session.username) {
         let username = req.session.username
         // Check if username ends with '@google' and remove it
@@ -536,9 +534,6 @@ app.get('/api/check-login', (req, res) => {
         return res.status(200).json({
             loggedIn: true,
             username: username // Return the cleaned username
-        return res.status(200).json({
-            loggedIn: true,
-            username: user.name // Include the username in the response
         });
     }
     res.status(401).json({ loggedIn: false });
