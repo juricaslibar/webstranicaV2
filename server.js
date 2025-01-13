@@ -14,10 +14,19 @@ const session = require('express-session');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
+const User = require('./models/user');
+const axios = require('axios'); // CommonJS syntax
 
 
 const app = express(); 
+const PORT = process.env.PORT || 3000;
 
+
+const mongoURI = `${process.env.MONGODB_URI}`;
+mongoose.connect(mongoURI)
+    .then(() => app.listen(PORT, () => console.log('Server started')))
+    .catch ((err) => console.log(err));
+     
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,7 +37,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost:27017/sessiondb',
+        mongoUrl: mongoURI,
         collectionName: 'sessions',
         ttl: 14 * 24 * 60 * 60, // 14 days
         autoRemove: 'native',
@@ -39,18 +48,6 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     }
 }));
-
-// Create data directory if it doesn't exist
-const DATA_DIR = './data';
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR);
-}
-
-// Ensure users file exists
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify({}), 'utf8');
-}
 
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
@@ -76,28 +73,14 @@ const decrypt = (text) => {
     return decrypted.toString();
 };
 
-// Generate device ID
-const generateDeviceId = (ip) => {
-    return encrypt(ip);
-};
-
-// Read users function
-const readUsers = () => {
+// Get all users
+const readUsers = async () => {
     try {
-        const data = fs.readFileSync(USERS_FILE, 'utf8');
-        return JSON.parse(data);
+        const users = await User.find();
+        return users;
     } catch (error) {
-        console.error('Error reading users file:', error);
+        console.error('Error reading users from the database:', error);
         return {};
-    }
-};
-
-// Write users function
-const writeUsers = (users) => {
-    try {
-        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
-    } catch (error) {
-        console.error('Error writing users file:', error);
     }
 };
 
@@ -134,70 +117,59 @@ passport.use(
         },
         (req, accessToken, refreshToken, profile, done) => {
             try {
-                const users = readUsers();
                 const email = profile.emails[0].value; // Extract user's email
-                const userId = email + "@google";
+                const userId = profile.name.givenName + "@google";
 
-                // Ensure user exists in the system
-                if (!users[userId]) {
-                    // Create new user for Google login
-                    users[userId] = {
-                        name: profile.name.givenName,
-                        email,
-                        password: null, // Not applicable for Google login
-                        registrationDate: new Date().toISOString(),
-                        isConfirmed: true, // Google users are considered confirmed
-                        isSubscribed1: false,
-                        isSubscribed2: false,
-                        devices: {},
-                    };
-                }
-
-                const user = users[userId];
-                let devices = user.devices || {};
-
-                // Extract client info (IP, user-agent) only if session is already initialized
                 const ip = req.session ? getClientInfo(req).ip : null;
                 const userAgent = req.session ? getClientInfo(req).userAgent : null;
                 const encryptedIP = ip ? encrypt(ip) : null;
 
-                // Check existing devices
-                const deviceKeys = Object.keys(devices);
 
-                if (deviceKeys.length == 0) {
-                    // First device
-                    devices[deviceKeys.length] = {
-                        ip: encryptedIP,
-                        lastUsed: new Date().toISOString(),
-                        userAgent,
-                    };
-                    req.session.username = userId; 
-                } else if (deviceKeys.length == 1) {
-                    // Second device
-                    if (decrypt(devices[0].ip) == ip) {
-                        devices[0].lastUsed = new Date().toISOString();
-                        devices[0].userAgent = userAgent;
-                    } else {
-                        devices[deviceKeys.length] = {
-                            ip: encryptedIP,
-                            lastUsed: new Date().toISOString(),
-                            userAgent,
-                        };
-                    }
-                } else {
-                    // Handle exceeding device limits
-                    return done(null, null);
-                }
+                User.findOne({ name: userId }) 
+                    .then(present => {
+                        if (present == null) {
+                            const user = new User({
+                                name: userId,
+                                email: email,
+                                password: null,
+                                isConfirmed: true,
+                                isSubscribed1: false,
+                                isSubscribed2: false,
+                                devices: {
+                                    ip: encryptedIP, userAgent: userAgent
+                                },
+                            });
+                            user.save();
+                            req.session.username = userId;
+                            return done(null, userId);
+                        }
 
-                user.devices = devices;
-                writeUsers(users);
+                        const device = present.devices;
+                        device.forEach((dev) => {
+                            if (dev && decrypt(dev.ip) != ip && device.length < 2) {
+                                present.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                                present.save();
+                                req.session.username = userId;
+                                return done(null, userId);
+                            }
+                            else if (dev && dev.userAgent != userAgent && device.length < 2) {
+                                present.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                                present.save();
+                                req.session.username = userId;
+                                return done(null, userId);
+                            }
+                            else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
+                                req.session.username = userId;
+                                return done(null, userId);
+                            } 
+                        }, () => { });
 
-                return done(null, {
-                    id: userId, // Ensure this field exists
-                    email: user.email,
-                    isConfirmed: user.isConfirmed,
-                    devices: devices,
-                });
+                        if (req.session.username != present.name) {
+                            return done(null, null);
+                        }
+
+                    })
+
             } catch (error) {
                 console.error("Google login error:", error);
                 return done(error, null);
@@ -207,25 +179,28 @@ passport.use(
 );
 
 
-passport.serializeUser((user, done) => {
-    if (user && user.id) {
-        console.log("Serializing user:", user.id);
-        done(null, user.id); // Store only the user ID in the session
+passport.serializeUser((userId, done) => {
+    if (userId) {
+        console.log("Serializing user:", userId);
+        done(null, userId); // Store only the user ID in the session
     } else {
-        console.error("Failed to serialize user: Missing user.id", user);
+        console.error("Failed to serialize user: Missing user.id", userId);
         done(null, false); // Pass `false` to indicate failure without throwing an error
     }
 });
 
 passport.deserializeUser((id, done) => {
-    const users = readUsers();
-    const user = users[id]; // Retrieve the full user object
-    if (user) {
-        done(null, user); // Pass the full user object to the request
-    } else {
-        console.error("Failed to deserialize user: User not found");
-        done(null, false); // Pass `false` to indicate failure without throwing an error
-    }
+    User.findOne({ name: id })
+        .then(present => {
+            if (present == null) {
+                console.error("Failed to deserialize user: User not found");
+                return done(null, false);
+            }
+            return done(null, present);
+        })
+        .catch(err => {
+            console.error(err);
+        }); 
 });
 
 // Authentication routes
@@ -240,16 +215,15 @@ app.get(
     (req, res) => {
         console.log("Authenticated user:", req.user); // Debug log
         if (req.user) {
-            req.session.username = req.user.id;
+            req.session.username = req.user;
             console.log("Session username set to:", req.session.username);
         } else {
             console.error("Authentication failed: req.user is undefined.");
         }
-
         res.redirect("/");
     }
 );
-
+ 
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -270,44 +244,34 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
-        const users = readUsers();
-
-        // Check if username exists
-        if (users[username]) {
-            return res.status(400).json({ error: 'Korisnicko ime vec postoji' });
-        }
-
-        // Check if email is already in use
-        const emailInUse = Object.values(users).some(user => user.email === email);
-        if (emailInUse) {
-            return res.status(400).json({ error: 'Email vec postoji' });
-        }
-
         // Get client info and create first device
         const { ip, userAgent } = getClientInfo(req);
         const encryptedIP = encrypt(ip);
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Check if username exists
+        const usernameExists = await User.findOne({ name: username });
+        if (usernameExists) {
+            return res.status(400).json({ error: 'Korisnicko ime vec postoji' });
+        }
 
-        // Store user with first device
-        users[username] = {
-            name: username,
-            email,
-            password: hashedPassword,
-            registrationDate: new Date().toISOString(),
+        // Check if email is already in use
+        const emailExists = await User.findOne({ email });
+        if (emailExists) {
+            return res.status(400).json({ error: 'Email vec postoji' });
+        }
+
+        // Store username and device information
+        const user = new User({
+            name: username, 
+            email: email,
+            password: password,
             isConfirmed: false,
             isSubscribed1: false,
             isSubscribed2: false,
-            devices: {
-                [0]: {
-                    ip: encryptedIP,
-                    userAgent,
-                    lastUsed: new Date().toISOString(),
-                }
-            }
-        };
-        writeUsers(users);
+            devices: { ip: encryptedIP, userAgent },
+        });
+         
+        await user.save(); // Save the user to the database
 
         // Generate email token
         const emailToken = jwt.sign(
@@ -317,7 +281,6 @@ app.post('/api/register', async (req, res) => {
         );
 
         const url = `${process.env.BASE_URL}/confirmation/${emailToken}`;
-
 
         // Send confirmation email
         transporter.sendMail({
@@ -351,12 +314,11 @@ app.post('/api/register', async (req, res) => {
             ]
         });
 
-        // Send JSON response first
+        // Send JSON response
         res.json({
             message: 'Registration successful',
             redirect: '/load'
         });
-
 
     } catch (error) {
         console.error('Registration error:', error);
@@ -373,18 +335,23 @@ app.get('/confirmation/:token', async (req, res) => {
         const users = readUsers();
 
         // Check if the user exists
-        if (!users[username]) {
-            return res.status(400).send('Invalid or expired token.');
-        }
+        User.findOne({ name: username })
+            .then(present => {
+                if (present == null) {
+                    return res.status(400).send('Invalid or expired token.');
+                }
+                present.isConfirmed = true;
+                present.save();
+                res.redirect(`${process.env.BASE_URL}/login`);
+            })
+            .catch(err => {
+                console.error('Email confirmation error:', error);
+                res.status(400).send('Invalid or expired token.');
+            });
 
-        // Mark user as confirmed
-        users[username].isConfirmed = true;
-        writeUsers(users);
-
-        res.redirect(`${process.env.BASE_URL}/login`);
     } catch (error) {
-        console.error('Email confirmation error:', error);
-        res.status(400).send('Invalid or expired token.');
+        console.error('Could not verify token', error);
+        res.status(400).send('Could not verify token');
     }
 });
 
@@ -398,13 +365,12 @@ app.post('/resend-email', async (req, res) => {
 
         const email = emails[0];  // Since we allow only one email
 
-        const users = readUsers();
+        User.findOne({ email: email })
+            .then(present => {
+                if (present == null || present.isConfirmed) {
+                    return res.status(400).json({ error: 'Email address not found or already confirmed.' });
+                }
 
-        const user = Object.values(users).find(u => u.email === email && !u.isConfirmed);
-
-        if (!user) {
-            return res.status(404).json({ error: 'Email address not found or already confirmed.' });
-        }
 
         // Generate email token
         const emailToken = jwt.sign(
@@ -416,7 +382,7 @@ app.post('/resend-email', async (req, res) => {
         const url = `${process.env.BASE_URL}/confirmation/${emailToken}`;
 
         // Send confirmation email
-        await transporter.sendMail({
+        transporter.sendMail({
             from: '"Stat&Mat" <your-email@gmail.com>',
             to: email,
             subject: 'Potvrda e-mail adrese',
@@ -451,84 +417,88 @@ app.post('/resend-email', async (req, res) => {
             message: 'Confirmation email has been resent.',
             url: url
         });
+            })
 
     } catch (error) {
         console.error('Error resending email:', error);
         res.status(500).json({ error: 'Server error' });
-    }
+    } 
 });
 
 
 app.post('/api/login', async (req, res) => {
     try {
-        const { userInput, password, deviceId } = req.body;
-
+        const { userInput, password, deviceId} = req.body;
         // Validation
         if (!userInput || !password) {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
-        const users = readUsers();
+        // Get client info
+        const ip = req.session ? getClientInfo(req).ip : null;
+        const userAgent = req.session ? getClientInfo(req).userAgent : null;
+        const encryptedIP = ip ? encrypt(ip) : null;
 
-        // Find user
-        const username = Object.keys(users).find(key =>
-            key === userInput || users[key].email === userInput
-        );
+        User.findOne({
+            $or: [
+                { name: userInput },
+                { email: userInput }
+            ]
+        })
+            .then(present => {
+                if (present == null) {
+                    return res.status(401).json({ error: 'Netočno korisničko ime ili email adresa' });
+                }
+                if (present.password !== password) {
+                    return res.status(401).json({ error: 'Netočna lozinka' });
+                }
+                if (!present.isConfirmed) {
+                    return res.status(401).json({ error: 'Potvrdite email adresu za nastavak' });
+                }
+                const device = present.devices;
+                device.forEach((dev) => {
+                    if (dev && decrypt(dev.ip) != ip && device.length < 2) {
+                        present.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                        present.save();
+                        req.session.username = present.name;
+                        console.log("Session username set to:", req.session.username);
+                        return res.json({
+                            message: 'Uspješna prijava',
+                            redirect: '/'
+                        });
+                    }
+                    else if (dev && dev.userAgent != userAgent && device.length < 2) {
+                        present.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                        present.save();
+                        req.session.username = present.name;
+                        console.log("Session username set to:", req.session.username);
+                        return res.json({
+                            message: 'Uspješna prijava',
+                            redirect: '/'
+                        });
+                    }
+                    else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
+                        req.session.username = present.name;
+                        console.log("Session username set to:", req.session.username);
+                        return res.json({
+                            message: 'Uspješna prijava',
+                            redirect: '/'
+                        });
+                    }
+                }, () => { });
 
-        if (!username || !users[username]) {
-            return res.status(401).json({ error: 'Netocno korisnicko ime' });
-        }
-
-        if (!users[username].isConfirmed) {
-            return res.status(401).json({ error: 'Potvrdite email adresu za nastavak' }); 
-        }
-
-        // Verify password
-        const isValid = await bcrypt.compare(password, users[username].password);
-        if (!isValid) {
-            return res.status(401).json({ error: 'Netocna lozinka' });
-        }
-
-        const { ip, userAgent } = getClientInfo(req);
-        const user = users[username];
-        const devices = user.devices;
-
-        // Check existing devices
-        const deviceKeys = Object.keys(devices);
-
-        if (deviceKeys.length == 1) {
-            // Second device
-            if (decrypt(devices[0].ip) == ip && devices[0].userAgent == userAgent) {
-                devices[0].lastUsed = new Date().toISOString();
-            } else {
-                devices[deviceKeys.length] = {
-                    ip: encrypt(ip),
-                    userAgent,
-                    lastUsed: new Date().toISOString(),
-                };
-            }
-        } else {
-            if (decrypt(devices[0].ip) == ip && devices[0].userAgent == userAgent) {
-                devices[0].lastUsed = new Date().toISOString();
-            }
-            else if (decrypt(devices[1].ip) == ip && devices[1].userAgent == userAgent) {
-                devices[1].lastUsed = new Date().toISOString();
-            } else {
-                return res.status(400).json({
-                    error: 'Maximum device limit reached',
-                    message: 'You have reached the maximum number of devices (2) for this account.',
-                    devices: deviceList });
-            }            
-        }
-
-        writeUsers(users);
-            req.session.username = username; // Store username in session
-            return res.json({
-                message: 'Login successful',
-                redirect: '/',
-                deviceId
+                if (req.session.username != present.name) {
+                    return res.status(400).json({
+                        error: 'Maksimalan broj uređaja dostignut',
+                        message: 'Maksimalan broj uređaja (2) dostignut za ovaj račun.',
+                    });
+                }
+                
+            })
+            .catch(err => {
+                console.error(err);
             });
-        
+
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Server error' });
@@ -549,93 +519,80 @@ app.post('/api/logout', (req, res) => {
         if (err) {
             return res.status(500).json({ error: 'Could not log out' });
         }
-        res.json({ message: 'Logout successful' });
+        res.json({ message: 'Odjava uspješna' });
     });
 });
 
 app.get('/api/check-login', (req, res) => {
     if (req.session.username) {
-        if (req.session.username.endsWith("@google")) {
-            return res.status(200).json({
-                loggedIn: true,
-                username: req.session.username.slice(0, -"@google".length) // Include the username in the response
-            });
+        let username = req.session.username
+        // Check if username ends with '@google' and remove it
+        if (username.endsWith('@google')) {
+            username = username.slice(0, -7); // Remove the last 7 characters ('@google')
         }
+
         return res.status(200).json({
             loggedIn: true,
-            username: req.session.username // Include the username in the response
+            username: username // Return the cleaned username
         });
     }
     res.status(401).json({ loggedIn: false });
 });
 
-// Get registered devices
-app.get('/api/devices/:username', async (req, res) => {
-    try {
-        const users = readUsers(); // Read the users from the JSON file
-        const user = users[req.params.username]; // Get the user by username
-
-        if (!user) {
-            return res.status(404).json({ error: 'User  not found' }); // Return error if user does not exist
-        }
-
-        // Map the devices to a more readable format
-        const devices = Object.entries(user.devices).map(([id, device]) => ({
-            id,
-            lastUsed: device.lastUsed,
-            userAgent: device.userAgent
-        }));
-
-        res.json({ devices }); // Return the devices in the response
-    } catch (error) {
-        console.error('Error fetching devices:', error);
-        res.status(500).json({ error: 'Server error' }); // Handle server errors
-    }
-});
-
 //Subscription - prvi kolokvij
 
 // Function to check subscription status
-const getSubscriptionStatus1 = (username) => {
-    const users = readUsers(); // Read the users from the JSON file
-    const user = users[username]; // Get the user by username
-
-    if (user && user.isSubscribed1) {
-        return { isSubscribed1: true };
-    } else {
-        return { isSubscribed1: false };
+const getSubscriptionStatus1 = async (username) => {
+    try {
+        const user = await User.findOne({ name: username });
+        if (!user) {
+            return { isSubscribed1: false }; // User not found
+        }
+        return { isSubscribed1: user.isSubscribed1 }; // Return user's subscription status
+    } catch (err) {
+        console.error('Error fetching subscription status:', err);
+        return { isSubscribed1: false }; // Default to unsubscribed on error
     }
 };
 
 // Middleware to check if the user is subscribed
-const requireSubscription1 = (req, res, next) => {
+const requireSubscription1 = async (req, res, next) => {
     const username = req.session.username; // Get the logged-in username from session
 
     if (!username) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(401).json({ error: 'Unauthorized' }); // No username in session
     }
 
-    const status = getSubscriptionStatus1(username); // Get the subscription status of the user
+    try {
+        const status = await getSubscriptionStatus1(username); // Await the subscription status
 
-    if (!status.isSubscribed1) {
-        return res.status(403).json({ error: 'Subscription required' });
+        if (!status.isSubscribed1) {
+            return res.status(403).json({ error: 'Subscription required' }); // User is not subscribed
+        }
+
+        next(); // User is subscribed, proceed to the next middleware or route handler
+    } catch (err) {
+        console.error('Error in requireSubscription1 middleware:', err);
+        return res.status(500).json({ error: 'Internal server error' }); // Handle unexpected errors
     }
-
-    next(); // User is subscribed, proceed to the next middleware or route handler
 };
 
 // Endpoint to get subscription status
-app.get('/api/subscription-status1', (req, res) => {
+app.get('/api/subscription-status1', async (req, res) => {
     const username = req.session.username; // Get the logged-in username from session
 
     if (!username) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(401).json({ error: 'Unauthorized' }); // No username in session
     }
 
-    const status = getSubscriptionStatus1(username); // Get the subscription status of the logged-in user
-
-    res.json(status); // Return the subscription status in the response
-}); 
+    try {
+        const status = await getSubscriptionStatus1(username); // Await the subscription status
+        res.json(status); // Return the subscription status in the response
+    } catch (err) {
+        console.error('Error fetching subscription status:', err);
+        res.status(500).json({ error: 'Internal server error' }); // Handle unexpected errors
+    }
+});
 
 app.post('/checkout1', ensureLoggedIn, async (req, res) => {
     const session = await stripe.checkout.sessions.create({
@@ -665,10 +622,6 @@ app.get('/complete1', async (req, res) => {
             stripe.checkout.sessions.listLineItems(req.query.session_id)
         ]);
 
-<<<<<<< HEAD
-=======
-    console.log(JSON.stringify(result, null, 2)); // 2 spaces for indentation
->>>>>>> ce79962be2adc503e2721e8d74f70abb71fd7b17
         // Log the session and line items details
         console.log("Session Details:", {
             id: session.id,
@@ -686,15 +639,21 @@ app.get('/complete1', async (req, res) => {
     if (!username) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const users = readUsers();
-    const user = users[username];
-    user.isSubscribed1 = true;  // Set the subscription status to true
-    writeUsers(users); 
+
+    User.findOne({
+        name: username
+    })
+        .then(present => {
+            if (present == null) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+            present.isSubscribed1 = true;
+            present.save();
 
     // Send email
     const mailOptions = {
         from: '"Stat&Mat" <your-email@gmail.com>',
-        to: user.email,
+        to: session.customer_details?.email,
         subject: 'Zahvaljujemo na kupovini!',
         html: `<!DOCTYPE html>
 <html lang="hr">
@@ -754,14 +713,14 @@ app.get('/complete1', async (req, res) => {
         <div class="content">
             <h1>Hvala Vam na kupovini!</h1>
             <p>Poštovani/a,</p>
-            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - prvi kolokvij"</strong>.</p>
+            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - prvi kolokvij"</strong> za račun <strong>${present.name}</strong>.</p>
             <p>Želimo Vam puno uspjeha u učenju i savladavanju gradiva.</p>
             <p>Ako imate dodatnih pitanja, slobodno nas kontaktirajte putem e-maila ili telefona.</p>
             <p>Srdačan pozdrav,</p>
-            <p><strong>Vaš Tim</strong></p>
+            <p><strong>Vaš Stat&mat</strong></p>
         </div>
         <div class="footer">
-            <p>&copy; 2025 Vaša Tvrtka. Sva prava pridržana.</p>
+            <p>&copy; 2024 Stat&mat. Sva prava zadržana.</p>
         </div>
     </div>
 </body>
@@ -813,50 +772,65 @@ app.get('/complete1', async (req, res) => {
             </body>
             </html>
         `);
+        })
+        .catch(err => {
+            console.error(err);
+        });
 })
 
 //Subscription - drugi kolokvij
 
 // Function to check subscription status
-const getSubscriptionStatus2 = (username) => {
-    const users = readUsers(); // Read the users from the JSON file
-    const user = users[username]; // Get the user by username
-
-    if (user && user.isSubscribed2) {
-        return { isSubscribed2: true };
-    } else {
-        return { isSubscribed2: false };
+const getSubscriptionStatus2 = async (username) => {
+    try {
+        const user = await User.findOne({ name: username });
+        if (!user) {
+            return { isSubscribed2: false }; // User not found
+        }
+        return { isSubscribed2: user.isSubscribed2 }; // Return user's subscription status
+    } catch (err) {
+        console.error('Error fetching subscription status:', err);
+        return { isSubscribed2: false }; // Default to unsubscribed on error
     }
 };
 
 // Middleware to check if the user is subscribed
-const requireSubscription2 = (req, res, next) => {
+const requireSubscription2 = async (req, res, next) => {
     const username = req.session.username; // Get the logged-in username from session
 
     if (!username) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(401).json({ error: 'Unauthorized' }); // No username in session
     }
 
-    const status = getSubscriptionStatus2(username); // Get the subscription status of the user
+    try {
+        const status = await getSubscriptionStatus2(username); // Await the subscription status
 
-    if (!status.isSubscribed2) {
-        return res.status(403).json({ error: 'Subscription required' });
+        if (!status.isSubscribed2) {
+            return res.status(403).json({ error: 'Subscription required' }); // User is not subscribed
+        }
+
+        next(); // User is subscribed, proceed to the next middleware or route handler
+    } catch (err) {
+        console.error('Error in requireSubscription1 middleware:', err);
+        return res.status(500).json({ error: 'Internal server error' }); // Handle unexpected errors
     }
-
-    next(); // User is subscribed, proceed to the next middleware or route handler
 };
 
 // Endpoint to get subscription status
-app.get('/api/subscription-status2', (req, res) => {
+app.get('/api/subscription-status2', async (req, res) => {
     const username = req.session.username; // Get the logged-in username from session
 
     if (!username) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(401).json({ error: 'Unauthorized' }); // No username in session
     }
 
-    const status = getSubscriptionStatus2(username); // Get the subscription status of the logged-in user
-
-    res.json(status); // Return the subscription status in the response
+    try {
+        const status = await getSubscriptionStatus2(username); // Await the subscription status
+        res.json(status); // Return the subscription status in the response
+    } catch (err) {
+        console.error('Error fetching subscription status:', err);
+        res.status(500).json({ error: 'Internal server error' }); // Handle unexpected errors
+    }
 });
 
 app.post('/checkout2', ensureLoggedIn, async (req, res) => {
@@ -883,33 +857,124 @@ app.post('/checkout2', ensureLoggedIn, async (req, res) => {
 
 app.get('/complete2', async (req, res) => {
     const [session, lineItems] = await Promise.all([
-            stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
-            stripe.checkout.sessions.listLineItems(req.query.session_id)
-        ]);
+        stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
+        stripe.checkout.sessions.listLineItems(req.query.session_id)
+    ]);
 
-        // Log the session and line items details
-        console.log("Session Details:", {
-            id: session.id,
-            amount_total: session.amount_total,
-            currency: session.currency,
-            payment_status: session.payment_status,
-            customer_email: session.customer_details?.email,
-            line_items: lineItems.data.map(item => ({
-                description: item.description,
-                amount: item.amount_total,
-            })),
-        });
+    // Log the session and line items details
+    console.log("Session Details:", {
+        id: session.id,
+        amount_total: session.amount_total,
+        currency: session.currency,
+        payment_status: session.payment_status,
+        customer_email: session.customer_details?.email,
+        line_items: lineItems.data.map(item => ({
+            description: item.description,
+            amount: item.amount_total,
+        })),
+    });
 
-    const username = req.session.username; 
+    const username = req.session.username;
     if (!username) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const users = readUsers();
-    const user = users[username];
-    user.isSubscribed2 = true;  // Set the subscription status to true
-    writeUsers(users);
+    User.findOne({
+        name: username
+    })
+        .then(present => {
+            if (present == null) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+            present.isSubscribed1 = true;
+            present.save();
 
-    res.send(`
+            // Send email
+            const mailOptions = {
+                from: '"Stat&Mat" <your-email@gmail.com>',
+                to: session.customer_details?.email,
+                subject: 'Zahvaljujemo na kupovini!',
+                html: `<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zahvalnica za kupovinu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 80px;
+            height: auto;
+        }
+        .content {
+            text-align: left;
+        }
+        .content h1 {
+            color: #333333;
+            font-size: 24px;
+        }
+        .content p {
+            color: #555555;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="cid:logo.ico" alt="Logo">
+        </div>
+        <div class="content">
+            <h1>Hvala Vam na kupovini!</h1>
+            <p>Poštovani/a,</p>
+            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - drugi kolokvij"</strong> za račun <strong>${present.name}</strong>.</p>
+            <p>Želimo Vam puno uspjeha u učenju i savladavanju gradiva.</p>
+            <p>Ako imate dodatnih pitanja, slobodno nas kontaktirajte putem e-maila ili telefona.</p>
+            <p>Srdačan pozdrav,</p>
+            <p><strong>Vaš Stat&mat</strong></p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Stat&mat. Sva prava zadržana.</p>
+        </div>
+    </div>
+</body>
+</html>`,
+                attachments: [
+                    {
+                        filename: 'logo.ico',
+                        path: './public/sprites/logo.ico',
+                        cid: 'logo.ico' // CID mora odgovarati src u HTML-u
+                    }
+                ]
+            };
+
+            transporter.sendMail(mailOptions);
+
+            res.send(`
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -945,7 +1010,101 @@ app.get('/complete2', async (req, res) => {
             </body>
             </html>
         `);
+        })
+        .catch(err => {
+            console.error(err);
+        });
 })
+
+// Proxy route to handle video requests with subscription check -- 1. kolokvij
+app.get('/proxy/1video', async (req, res) => {
+    try {
+
+        let videoUrl;
+        const queryParams = req.query;
+        const Param = queryParams.Param || '';
+
+        //Url za vide
+        if (Param == '1.2.1') {
+            videoUrl = 'https://iframe.mediadelivery.net/embed/368157/5eee48d7-6981-461f-9185-1d51c8f34764?autoplay=false&loop=false&muted=false&preload=true&responsive=true';
+        }
+        if (Param == '1.2.2') {
+            videoUrl = 'https://iframe.mediadelivery.net/embed/368157/15ee6ea2-83b9-474a-a658-fd4920548cbc?autoplay=false&loop=false&muted=false&preload=true&responsive=true';
+        }
+            
+        // First, check if the user is subscribed
+        const username = req.session.username;
+        if (!username) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Fetch user subscription status
+        const present = await User.findOne({ name: username });
+
+        if (present == null) {
+            return res.status(403).json({ error: 'User not found' });
+        } else if (!present.isSubscribed1) {
+            return res.status(403).json({ error: 'Subscription required' });
+        }
+
+        // Make a GET request to fetch the video content
+        const response = await axios.get(videoUrl, {
+            responseType: 'stream'
+        });
+
+        // Pipe the response content to the client's response
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.error('Error fetching video:', error);
+        res.status(500).json({ error: 'Failed to fetch the video' });
+    }
+});
+
+// Proxy route to handle video requests with subscription check -- 2.kolokvij
+app.get('/proxy/2video', async (req, res) => {
+    try {
+
+        let videoUrl;
+        const queryParams = req.query;
+        const Param = queryParams.Param || '';
+
+        //Url za vide
+        if (Param == '2.2.1') {
+            videoUrl = 'https://iframe.mediadelivery.net/embed/368157/5eee48d7-6981-461f-9185-1d51c8f34764?autoplay=false&loop=false&muted=false&preload=true&responsive=true';
+        }
+        if (Param == '2.2.2') {
+            videoUrl = 'https://iframe.mediadelivery.net/embed/368157/15ee6ea2-83b9-474a-a658-fd4920548cbc?autoplay=false&loop=false&muted=false&preload=true&responsive=true';
+        }
+            
+        // First, check if the user is subscribed
+        const username = req.session.username;
+        if (!username) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Fetch user subscription status
+        const present = await User.findOne({ name: username });
+
+        if (present == null) {
+            return res.status(403).json({ error: 'User not found' });
+        } else if (!present.isSubscribed2) {
+            return res.status(403).json({ error: 'Subscription required' });
+        }
+
+        // Make a GET request to fetch the video content
+        const response = await axios.get(videoUrl, {
+            responseType: 'stream'
+        });
+
+        // Pipe the response content to the client's response
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.error('Error fetching video:', error);
+        res.status(500).json({ error: 'Failed to fetch the video' });
+    }
+});
 
 // Routes
 app.get('/Matematika1', (req, res) => {
@@ -981,10 +1140,3 @@ app.get('/Matematika_prvi_kol', requireSubscription1, (req, res) => {
 app.get('/Matematika_drugi_kol', requireSubscription2, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Matematika_drugi_kol.html'));
 });
-
-app.get('/video1', requireSubscription1  , (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'video1.html'));
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server started'))
