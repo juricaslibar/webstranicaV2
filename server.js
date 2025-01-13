@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Allow requests from your frontend domain
 app.use(cors({
-    origin: 'https://webstranicav2.onrender.com', // Replace with your actual frontend URL
+    origin: '*',  // Allow all origins
     credentials: true // Allow cookies and credentials
 }));
 
