@@ -467,7 +467,17 @@ app.post('/api/login', async (req, res) => {
                         present.devices.push({ ip: encryptedIP, userAgent: userAgent });
                         present.save();
                         req.session.username = present.name;
-                        console.log("Session username set to:", req.session.username);
+req.session.save(err => {
+    if (err) {
+        console.error('Error saving session:', err);
+        return res.status(500).json({ error: 'Failed to save session' });
+    }
+    res.json({
+        message: 'Successful login',
+        redirect: '/'
+    });
+});
+
                         return res.json({
                             message: 'Uspješna prijava',
                             redirect: '/'
@@ -477,7 +487,17 @@ app.post('/api/login', async (req, res) => {
                         present.devices.push({ ip: encryptedIP, userAgent: userAgent });
                         present.save();
                         req.session.username = present.name;
-                        console.log("Session username set to:", req.session.username);
+req.session.save(err => {
+    if (err) {
+        console.error('Error saving session:', err);
+        return res.status(500).json({ error: 'Failed to save session' });
+    }
+    res.json({
+        message: 'Successful login',
+        redirect: '/'
+    });
+});
+
                         return res.json({
                             message: 'Uspješna prijava',
                             redirect: '/'
@@ -485,7 +505,17 @@ app.post('/api/login', async (req, res) => {
                     }
                     else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
                         req.session.username = present.name;
-                        console.log("Session username set to:", req.session.username);
+req.session.save(err => {
+    if (err) {
+        console.error('Error saving session:', err);
+        return res.status(500).json({ error: 'Failed to save session' });
+    }
+    res.json({
+        message: 'Successful login',
+        redirect: '/'
+    });
+});
+
                         return res.json({
                             message: 'Uspješna prijava',
                             redirect: '/'
