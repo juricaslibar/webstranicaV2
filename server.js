@@ -524,6 +524,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-login', (req, res) => {
+    console.log(req.session.username);
     if (req.session.username) {
         let username = req.session.username
         // Check if username ends with '@google' and remove it
