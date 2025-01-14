@@ -151,17 +151,27 @@ passport.use(
                         devices: [{ ip: encryptedIP, userAgent: userAgent }],
                     });
                     await user.save();
-                } else {
-                    // Check if device is already registered
-                    const isDeviceRegistered = user.devices.some(
-                        (dev) =>
-                            decrypt(dev.ip) === ip && dev.userAgent === userAgent
-                    );
+                    return done(null, userId); // Pass user ID for session
+                }
 
-                    if (!isDeviceRegistered && user.devices.length < 2) {
-                        user.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                        await user.save();
+                // If the user exists, check device registration
+                const isDeviceRegistered = user.devices.some(
+                    (dev) =>
+                        decrypt(dev.ip) === ip && dev.userAgent === userAgent
+                );
+
+                if (!isDeviceRegistered) {
+                    if (user.devices.length >= 2) {
+                        // Prevent login if the user tries to register a third device
+                        console.warn(
+                            `User ${userId} tried to register a third device. Login denied.`
+                        );
+                        return done(null, false, { message: "Too many devices registered." });
                     }
+
+                    // Register the new device
+                    user.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                    await user.save();
                 }
 
                 return done(null, userId); // Pass user ID for session
@@ -199,7 +209,6 @@ app.get(
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-// Google Authentication Callback
 app.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/" }),
@@ -209,13 +218,14 @@ app.get(
                 req.session.username = req.user; // Save the username to the session
                 await req.session.save(); // Ensure the session is saved
                 console.log("Session username set to:", req.session.username);
+                res.redirect("/"); // Redirect to the homepage
             } else {
-                console.error("Authentication failed: req.user is undefined.");
+                console.error("Authentication failed: req.user is undefined or login denied.");
+                res.redirect("/error"); // Redirect to an error page
             }
-            res.redirect("/"); // Redirect to the homepage
         } catch (error) {
             console.error("Error during Google auth callback:", error);
-            res.redirect("/error"); // Redirect to an error page if needed
+            res.redirect("/error"); // Redirect to an error page
         }
     }
 );
