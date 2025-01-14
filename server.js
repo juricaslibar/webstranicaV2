@@ -214,16 +214,21 @@ app.get(
 app.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/" }),
-    (req, res) => {
-        console.log("Authenticated user:", req.user); // Debug log
-        if (req.user) {
-            req.session.username = req.user;
-            await req.session.save(); // Ensure the session is saved
-            console.log("Session username set to:", req.session.username);
-        } else {
-            console.error("Authentication failed: req.user is undefined.");
+    async (req, res) => { // Mark the callback as async
+        try {
+            console.log("Authenticated user:", req.user); // Debug log
+            if (req.user) {
+                req.session.username = req.user;
+                await req.session.save(); // Save the session
+                console.log("Session username set to:", req.session.username);
+            } else {
+                console.error("Authentication failed: req.user is undefined.");
+            }
+            res.redirect("/");
+        } catch (error) {
+            console.error("Error during Google auth callback:", error);
+            res.redirect("/error"); // Redirect to an error page if needed
         }
-        res.redirect("/");
     }
 );
  
