@@ -120,7 +120,6 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 
 
-// Passport strategy for Google login
 passport.use(
     new GoogleStrategy(
         {
@@ -129,7 +128,7 @@ passport.use(
             callbackURL: `${process.env.BASE_URL}/auth/google/callback`,
             passReqToCallback: true,
         },
-        (req, accessToken, refreshToken, profile, done) => {
+        async (req, accessToken, refreshToken, profile, done) => {
             try {
                 const email = profile.emails[0].value; // Extract user's email
                 const userId = profile.name.givenName + "@google";
@@ -138,52 +137,34 @@ passport.use(
                 const userAgent = req.session ? getClientInfo(req).userAgent : null;
                 const encryptedIP = ip ? encrypt(ip) : null;
 
+                let user = await User.findOne({ name: userId });
 
-                User.findOne({ name: userId })
-                    .then(present => {
-                        if (present == null) {
-                            const user = new User({
-                                name: userId,
-                                email: email,
-                                password: null,
-                                isConfirmed: true,
-                                isSubscribed1: false,
-                                isSubscribed2: false,
-                                devices: {
-                                    ip: encryptedIP, userAgent: userAgent
-                                },
-                            });
-                            user.save();
-                            req.session.username = userId;
-                            return done(null, userId);
-                        }
+                if (!user) {
+                    // Create a new user if not found
+                    user = new User({
+                        name: userId,
+                        email: email,
+                        password: null,
+                        isConfirmed: true,
+                        isSubscribed1: false,
+                        isSubscribed2: false,
+                        devices: [{ ip: encryptedIP, userAgent: userAgent }],
+                    });
+                    await user.save();
+                } else {
+                    // Check if device is already registered
+                    const isDeviceRegistered = user.devices.some(
+                        (dev) =>
+                            decrypt(dev.ip) === ip && dev.userAgent === userAgent
+                    );
 
-                        const device = present.devices;
-                        device.forEach((dev) => {
-                            if (dev && decrypt(dev.ip) != ip && device.length < 2) {
-                                present.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                                present.save();
-                                req.session.username = userId;
-                                return done(null, userId);
-                            }
-                            else if (dev && dev.userAgent != userAgent && device.length < 2) {
-                                present.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                                present.save();
-                                req.session.username = userId;
-                                return done(null, userId);
-                            }
-                            else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
-                                req.session.username = userId;
-                                return done(null, userId);
-                            }
-                        }, () => { });
+                    if (!isDeviceRegistered && user.devices.length < 2) {
+                        user.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                        await user.save();
+                    }
+                }
 
-                        if (req.session.username != present.name) {
-                            return done(null, null);
-                        }
-
-                    })
-
+                return done(null, userId); // Pass user ID for session
             } catch (error) {
                 console.error("Google login error:", error);
                 return done(error, null);
@@ -194,49 +175,44 @@ passport.use(
 
 
 passport.serializeUser((userId, done) => {
-    if (userId) {
-        console.log("Serializing user:", userId);
-        done(null, userId); // Store only the user ID in the session
-    } else {
-        console.error("Failed to serialize user: Missing user.id", userId);
-        done(null, false); // Pass `false` to indicate failure without throwing an error
+    console.log("Serializing user:", userId);
+    done(null, userId); // Store only the user ID in the session
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findOne({ name: id });
+        if (!user) {
+            console.error("Failed to deserialize user: User not found");
+            return done(null, false);
+        }
+        return done(null, user); // Pass the full user object
+    } catch (error) {
+        console.error("Error during deserialization:", error);
+        done(error, null);
     }
 });
 
-passport.deserializeUser((id, done) => {
-    User.findOne({ name: id })
-        .then(present => {
-            if (present == null) {
-                console.error("Failed to deserialize user: User not found");
-                return done(null, false);
-            }
-            return done(null, present);
-        })
-        .catch(err => {
-            console.error(err);
-        }); 
-});
-
-// Authentication routes
+// Google Authentication Initiation
 app.get(
     "/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
+// Google Authentication Callback
 app.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/" }),
-    async (req, res) => { // Mark the callback as async
+    async (req, res) => {
         try {
-            console.log("Authenticated user:", req.user); // Debug log
             if (req.user) {
-                req.session.username = req.user;
-                await req.session.save(); // Save the session
+                req.session.username = req.user; // Save the username to the session
+                await req.session.save(); // Ensure the session is saved
                 console.log("Session username set to:", req.session.username);
             } else {
                 console.error("Authentication failed: req.user is undefined.");
             }
-            res.redirect("/");
+            res.redirect("/"); // Redirect to the homepage
         } catch (error) {
             console.error("Error during Google auth callback:", error);
             res.redirect("/error"); // Redirect to an error page if needed
