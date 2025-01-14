@@ -153,8 +153,9 @@ passport.use(
                                     ip: encryptedIP, userAgent: userAgent
                                 },
                             });
-                            user.save();
+                            await user.save();
                             req.session.username = userId;
+                            await req.session.save(); // Ensure the session is saved
                             return done(null, userId);
                         }
 
@@ -162,18 +163,21 @@ passport.use(
                         device.forEach((dev) => {
                             if (dev && decrypt(dev.ip) != ip && device.length < 2) {
                                 present.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                                present.save();
+                                await present.save();
                                 req.session.username = userId;
+                                await req.session.save(); // Ensure the session is saved
                                 return done(null, userId);
                             }
                             else if (dev && dev.userAgent != userAgent && device.length < 2) {
                                 present.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                                present.save();
+                                await present.save();
                                 req.session.username = userId;
+                                await req.session.save(); // Ensure the session is saved
                                 return done(null, userId);
                             }
                             else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
                                 req.session.username = userId;
+                                await req.session.save(); // Ensure the session is saved
                                 return done(null, userId);
                             } 
                         }, () => { });
@@ -230,6 +234,7 @@ app.get(
         console.log("Authenticated user:", req.user); // Debug log
         if (req.user) {
             req.session.username = req.user;
+            await req.session.save(); // Ensure the session is saved
             console.log("Session username set to:", req.session.username);
         } else {
             console.error("Authentication failed: req.user is undefined.");
