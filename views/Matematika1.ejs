@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matematika 1 - Buy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title>Matematika - Drugi Kolokvij</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Reset some default styles */
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #2563eb;
+            --background-color: #f0f9ff;
+            --text-color: #1e293b;
+            --card-background: #ffffff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +21,7 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             display: flex;
@@ -22,84 +29,138 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
-            background-color: white;
+            background-color: var(--card-background);
             padding: 40px;
-            border-radius: 10px;
+            border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 500px;
+            width: 100%;
+            max-width: 700px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
         }
 
         h1 {
             color: var(--primary-color);
             margin-bottom: 20px;
             font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
 
         p {
-            font-size: 18px;
+            font-size: 1.1rem;
             color: var(--text-color);
             margin-bottom: 20px;
-            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
         }
 
         .buy-button {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
             width: 100%;
             max-width: 300px;
-            margin-top: 20px;
+            letter-spacing: 1px;
         }
 
         .buy-button:hover {
             background-color: var(--secondary-color);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Colors using CSS Variables */
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1d4ed8;
-            --background-color: #f8fafc;
-            --text-color: #1e293b;
+        .buy-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
         }
 
-        /* Responsive adjustments */
+        .lesson-list {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .lesson-list li {
+            margin-bottom: 10px;
+        }
+
         @media (max-width: 600px) {
             .container {
-                padding: 20px;
+                padding: 30px;
                 width: 90%;
             }
             h1 {
                 font-size: 2rem;
             }
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>Matematika - Prvi Kolokvij</h1>
+        
+        <p class="price">Cijena: €20.00</p>
         <p>
-            This is the first exam of the "Matematika 1" course. It�s designed to help you assess your understanding 
-            of key mathematical concepts. Don�t miss your chance to secure your place!
+            Pripremite se za prvi kolokvij iz matematike s našim sveobuhvatnim materijalom za učenje. 
+            Ovaj paket je osmišljen kako bi vam pomogao u savladavanju gradiva i briljiranju u vašem kolegiju matematike.
         </p>
-        <p><strong>Price:</strong> �30.00</p>
-        <form action="/checkout1" method="post">
-            <input type="submit" class="buy-button" value="Proceed to Buy">
-        </form>
-    </div>
+        
+        <h2>Sadržaj videolekcija</h2>
+        <ul class="lesson-list">
+            <li><strong>Matrice:</strong> Naučite sve o matričnim operacijama, determinantama i njihovoj primjeni u rješavanju sustava linearnih jednadžbi.</li>
+            <li><strong>Funkcije jedne varijable:</strong> Explore functions of a single variable, including limits, continuity, and differentiation.</li>
+        </ul>
+        
+        <h2>Trajanje videolekcija</h2>
+        <p>Ukupno trajanje lekcija: <strong>30 sati</strong></p>
+                
 
+        <h2 style="color: red;">Informacije o plačanju</h2>
+         <p>
+            Korištenje Stripe-a omogućuje sigurnu obradu uplata na našoj web stranici. Stripe je pružatelj usluga za online plaćanje koji pruža visoke sigurnosne standarde za zaštitu podataka kupaca.
+           </p>
+           <p>
+           Možete birati između različitih načina plaćanja, uključujući kartično plaćanje (Visa, Mastercard, American Express) i druge metode koje Stripe omogućava. 
+        </p>
+        <p style="color: red; font-weight: bold;">  
+    Naša usluga omogućava pristup sadržaju s najviše dva uređaja po korisničkom računu.  
+    Dijeljenje računa s više od dva uređaja nije dopušteno kako bismo zaštitili autorska prava i omogućili pošteno korištenje.
+</p>
+    <form action="/checkout1" method="post">
+            <button type="submit" class="buy-button">AKTIVIRAJ</button>
+        </form>
+
+    </div>
 </body>
 </html>
+
