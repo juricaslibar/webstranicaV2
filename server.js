@@ -120,6 +120,7 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 
 
+// Passport strategy for Google login
 passport.use(
     new GoogleStrategy(
         {
@@ -128,50 +129,61 @@ passport.use(
             callbackURL: `${process.env.BASE_URL}/auth/google/callback`,
             passReqToCallback: true,
         },
-        async (req, accessToken, refreshToken, profile, done) => { // Mark as async
+        (req, accessToken, refreshToken, profile, done) => {
             try {
                 const email = profile.emails[0].value; // Extract user's email
                 const userId = profile.name.givenName + "@google";
 
-                // Get client info if session is present
                 const ip = req.session ? getClientInfo(req).ip : null;
                 const userAgent = req.session ? getClientInfo(req).userAgent : null;
                 const encryptedIP = ip ? encrypt(ip) : null;
 
-                let user = await User.findOne({ name: userId });
 
-                if (!user) {
-                    // Create a new user if not found
-                    user = new User({
-                        name: userId,
-                        email: email,
-                        password: null,
-                        isConfirmed: true,
-                        isSubscribed1: false,
-                        isSubscribed2: false,
-                        devices: [{ ip: encryptedIP, userAgent: userAgent }],
-                    });
-                    await user.save();
+                User.findOne({ name: userId })
+                    .then(present => {
+                        if (present == null) {
+                            const user = new User({
+                                name: userId,
+                                email: email,
+                                password: null,
+                                isConfirmed: true,
+                                isSubscribed1: false,
+                                isSubscribed2: false,
+                                devices: {
+                                    ip: encryptedIP, userAgent: userAgent
+                                },
+                            });
+                            user.save();
+                            req.session.username = userId;
+                            return done(null, userId);
+                        }
 
-                    req.session.username = userId;
-                    await req.session.save(); // Ensure the session is saved
-                    return done(null, userId);
-                }
+                        const device = present.devices;
+                        device.forEach((dev) => {
+                            if (dev && decrypt(dev.ip) != ip && device.length < 2) {
+                                present.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                                present.save();
+                                req.session.username = userId;
+                                return done(null, userId);
+                            }
+                            else if (dev && dev.userAgent != userAgent && device.length < 2) {
+                                present.devices.push({ ip: encryptedIP, userAgent: userAgent });
+                                present.save();
+                                req.session.username = userId;
+                                return done(null, userId);
+                            }
+                            else if (dev && decrypt(dev.ip) == ip && dev.userAgent == userAgent) {
+                                req.session.username = userId;
+                                return done(null, userId);
+                            }
+                        }, () => { });
 
-                // Check if the current device is already registered
-                const isDeviceRegistered = user.devices.some(
-                    (dev) =>
-                        decrypt(dev.ip) === ip && dev.userAgent === userAgent
-                );
+                        if (req.session.username != present.name) {
+                            return done(null, null);
+                        }
 
-                if (!isDeviceRegistered && user.devices.length < 2) {
-                    user.devices.push({ ip: encryptedIP, userAgent: userAgent });
-                    await user.save();
-                }
+                    })
 
-                req.session.username = userId;
-                await req.session.save(); // Ensure the session is saved
-                return done(null, userId);
             } catch (error) {
                 console.error("Google login error:", error);
                 return done(error, null);
