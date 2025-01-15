@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <title>Potvrdi email</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            background-color: #E8E8E8;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
             color: #1e293b;
             text-align: center;
         }
@@ -20,17 +22,19 @@
             max-width: 400px;
             padding: 20px;
             background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             color: #2563eb;
+            margin-bottom: 10px;
         }
 
         p {
-            margin-top: 20px;
+            margin: 15px 0;
             font-size: 18px;
+            line-height: 1.5;
         }
 
         .loader {
@@ -50,15 +54,18 @@
 
         #resendEmailButton {
             display: block;
-            margin-top: 20px;
-            padding: 10px 15px;
+            margin: 20px 0;
+            padding: 12px 15px;
             background-color: #2563eb;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
+            font-size: 16px;
+            font-weight: bold;
             text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         #resendEmailButton:hover {
@@ -70,10 +77,29 @@
             margin-top: 20px;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 12px;
             width: 100%;
             box-sizing: border-box;
             font-size: 16px;
+        }
+
+        #secondaryButton {
+            margin: 15px 0;
+            display: block;
+            padding: 14px 15px; /* Increased padding for taller button */
+            border: none;
+            background-color: #e2e8f0;
+            color: #374151;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #secondaryButton:hover {
+            background-color: #cbd5e1;
         }
 
         #resendStatus {
@@ -86,12 +112,13 @@
 
     <div class="container">
         <h1>Potvrdi email</h1>
-        <p>Email sa linkom za registraciju vam je poslan na mail.</p>
-        <p>Ne vidite li email, provjerite pretinac za smece</p>
+        <p>Email sa linkom za registraciju vam je poslan na mail.
+        Ne vidite li email, provjerite pretinac za smeće.</p>
         <div class="loader"></div>
-        <p>U slucaju da idalje ne vidite email za potvrdu, unesite mail kojim ste se prijavili kako bi vam mogli ponovno poslati mail</p>
-        <input type="email" id="emailInput" placeholder="Enter your email" />
-        <button id="resendEmailButton">Resend Email</button>
+        <p>U slučaju da i dalje ne vidite email za potvrdu, unesite mail kojim ste se prijavili kako bismo vam mogli ponovno poslati mail.</p>
+        <input type="email" id="emailInput" placeholder="Unesite vašu email adresu" />
+        <button id="resendEmailButton">Ponovno pošalji mail</button>
+        <a id="secondaryButton" href="/login">Već sam potvrdio mail</a>
         <div id="resendStatus"></div>
     </div>
 
@@ -102,7 +129,7 @@
                 const email = emailInput.value.trim();
 
                 if (!email) {
-                    alert('Please enter your email address.');
+                    alert('Unesite vašu email adresu.');
                     return;
                 }
 
@@ -120,7 +147,7 @@
                     alert(result.message);
                     emailInput.value = '';  // Clear the input field after success
                 } else {
-                    throw new Error(result.error || 'Something went wrong, please try again later.');
+                    throw new Error(result.error || 'Došlo je do pogreške. Pokušajte ponovno kasnije.');
                 }
 
             } catch (error) {
