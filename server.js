@@ -157,7 +157,7 @@ passport.use(
                 // If the user exists, check device registration
                 const isDeviceRegistered = user.devices.some(
                     (dev) =>
-                        decrypt(dev.ip) === ip && dev.userAgent === userAgent
+                        dev.userAgent === userAgent
                 );
 
                 if (!isDeviceRegistered) {
@@ -622,22 +622,22 @@ app.post('/checkout1', ensureLoggedIn, async (req, res) => {
  
 app.get('/complete1', async (req, res) => {
     const [session, lineItems] = await Promise.all([
-            stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
-            stripe.checkout.sessions.listLineItems(req.query.session_id)
-        ]);
+        stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
+        stripe.checkout.sessions.listLineItems(req.query.session_id)
+    ]);
 
-        // Log the session and line items details
-        console.log("Session Details:", {
-            id: session.id,
-            amount_total: session.amount_total,
-            currency: session.currency,
-            payment_status: session.payment_status,
-            customer_email: session.customer_details?.email,
-            line_items: lineItems.data.map(item => ({
-                description: item.description,
-                amount: item.amount_total,
-            })),
-        });
+    // Log the session and line items details
+    console.log("Session Details:", {
+        id: session.id,
+        amount_total: session.amount_total,
+        currency: session.currency,
+        payment_status: session.payment_status,
+        customer_email: session.customer_details?.email,
+        line_items: lineItems.data.map(item => ({
+            description: item.description,
+            amount: item.amount_total,
+        })),
+    });
 
     const username = req.session.username;
     if (!username) {
@@ -654,12 +654,18 @@ app.get('/complete1', async (req, res) => {
             present.isSubscribed1 = true;
             present.save();
 
-    // Send email
-    const mailOptions = {
-        from: '"Stat&Mat" <your-email@gmail.com>',
-        to: session.customer_details?.email,
-        subject: 'Zahvaljujemo na kupovini!',
-        html: `<!DOCTYPE html>
+            let name = present.name;
+            // Check if username ends with '@google' and remove it
+            if (name.endsWith('@google')) {
+                name = name.slice(0, -7); // Remove the last 7 characters ('@google')
+            }
+
+            // Send email
+            const mailOptions = {
+                from: '"Stat&Mat" <your-email@gmail.com>',
+                to: session.customer_details?.email,
+                subject: 'Zahvaljujemo na kupovini!',
+                html: `<!DOCTYPE html>
 <html lang="hr">
 <head>
     <meta charset="UTF-8">
@@ -717,7 +723,7 @@ app.get('/complete1', async (req, res) => {
         <div class="content">
             <h1>Hvala Vam na kupovini!</h1>
             <p>Poštovani/a,</p>
-            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - prvi kolokvij"</strong> za račun <strong>${present.name}</strong>.</p>
+            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - prvi kolokvij"</strong> za račun <strong>${name}</strong>.</p>
             <p>Želimo Vam puno uspjeha u učenju i savladavanju gradiva.</p>
             <p>Ako imate dodatnih pitanja, slobodno nas kontaktirajte putem e-maila ili telefona.</p>
             <p>Srdačan pozdrav,</p>
@@ -729,18 +735,18 @@ app.get('/complete1', async (req, res) => {
     </div>
 </body>
 </html>`,
-        attachments: [
-            {
-                filename: 'logo.ico',
-                path: './public/sprites/logo.ico',
-                cid: 'logo.ico' // CID mora odgovarati src u HTML-u
-            }
-        ]
-    };
+                attachments: [
+                    {
+                        filename: 'logo.ico',
+                        path: './public/sprites/logo.ico',
+                        cid: 'logo.ico' // CID mora odgovarati src u HTML-u
+                    }
+                ]
+            };
 
-    transporter.sendMail(mailOptions);
+            transporter.sendMail(mailOptions);
 
-    res.send(`
+            res.send(`
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -892,6 +898,12 @@ app.get('/complete2', async (req, res) => {
             present.isSubscribed1 = true;
             present.save();
 
+            let name = present.name;
+            // Check if username ends with '@google' and remove it
+            if (name.endsWith('@google')) {
+                name = name.slice(0, -7); // Remove the last 7 characters ('@google')
+            }
+
             // Send email
             const mailOptions = {
                 from: '"Stat&Mat" <your-email@gmail.com>',
@@ -955,7 +967,7 @@ app.get('/complete2', async (req, res) => {
         <div class="content">
             <h1>Hvala Vam na kupovini!</h1>
             <p>Poštovani/a,</p>
-            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - drugi kolokvij"</strong> za račun <strong>${present.name}</strong>.</p>
+            <p>Zahvaljujemo na Vašoj narudžbi. Uspješno ste kupili proizvod <strong>"Matematika - drugi kolokvij"</strong> za račun <strong>${name}</strong>.</p>
             <p>Želimo Vam puno uspjeha u učenju i savladavanju gradiva.</p>
             <p>Ako imate dodatnih pitanja, slobodno nas kontaktirajte putem e-maila ili telefona.</p>
             <p>Srdačan pozdrav,</p>
@@ -1035,7 +1047,7 @@ app.get('/proxy/1video', async (req, res) => {
         if (Param == '1.2.2') {
             videoUrl = 'https://iframe.mediadelivery.net/embed/368157/15ee6ea2-83b9-474a-a658-fd4920548cbc?autoplay=false&loop=false&muted=false&preload=true&responsive=true';
         }
-            
+
         // First, check if the user is subscribed
         const username = req.session.username;
         if (!username) {
@@ -1080,7 +1092,7 @@ app.get('/proxy/2video', async (req, res) => {
         if (Param == '2.2.2') {
             videoUrl = 'https://iframe.mediadelivery.net/embed/368157/15ee6ea2-83b9-474a-a658-fd4920548cbc?autoplay=false&loop=false&muted=false&preload=true&responsive=true';
         }
-            
+
         // First, check if the user is subscribed
         const username = req.session.username;
         if (!username) {
@@ -1138,7 +1150,7 @@ app.get('/cancel', (req, res) => {
 })
 // Protected routes requiring subscription
 app.get('/Matematika_prvi_kol', requireSubscription1, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'Matematika_prvi_kol.html')); 
+    res.sendFile(path.join(__dirname, 'public', 'Matematika_prvi_kol.html'));
 });
 
 app.get('/Matematika_drugi_kol', requireSubscription2, (req, res) => {
