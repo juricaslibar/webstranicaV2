@@ -56,12 +56,6 @@ app.use(session({
     }
 }));
 
-// Log session creation and cookies
-app.use((req, res, next) => {
-    console.log('Session ID:', req.session.id);
-    console.log('Cookies:', req.cookies);  // Debugging cookies
-    next();
-});
 
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
@@ -517,12 +511,22 @@ function ensureLoggedIn(req, res, next) {
     }
 }
 
+
+// Logout route to destroy the session
 app.post('/api/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.status(500).json({ error: 'Could not log out' });
         }
-        res.json({ message: 'Odjava uspješna' });
+
+        // Also remove session from the MongoDB store
+        req.sessionStore.destroy(req.sessionID, (storeErr) => {
+            if (storeErr) {
+                return res.status(500).json({ error: 'Could not log out and delete session from database' });
+            }
+
+            res.json({ message: 'Odjava uspješna' });
+        });
     });
 });
 
