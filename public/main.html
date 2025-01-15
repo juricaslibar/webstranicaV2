@@ -12,13 +12,14 @@
         :root {
             --primary-color: #3b82f6;
             --secondary-color: #1d4ed8;
-            --background-color: #f0f7ff;
+            --background-color: #E8E8E8;
             --text-color: #1e293b;
             --menu-bg-color: white;
             --menu-border-color: #e2e8f0;
             --border-color: #e2e8f0;
             --card-bg-color: #ffffff;
             --shadow-color: rgba(0, 0, 0, 0.1);
+            --footer-bg-color: #f8fafc;
         }
 
         * {
@@ -30,25 +31,24 @@
 
         html {
             scroll-behavior: smooth;
-            overflow-y: scroll; /* Ensure the scrollbar is visible */
-            scrollbar-width: thin; /* For Firefox */
-            scrollbar-color: #3b82f6 #f0f7ff; /* Scroll thumb and track colors */
+            overflow-y: scroll;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 #f0f7ff;
         }
 
         body::-webkit-scrollbar {
-            width: 8px; /* Scrollbar width */
+            width: 8px;
         }
 
         body::-webkit-scrollbar-track {
-            background: #f0f7ff; /* Track color */
+            background: #f0f7ff;
         }
 
         body::-webkit-scrollbar-thumb {
-            background-color: #3b82f6; /* Scroll thumb color */
+            background-color: #3b82f6;
             border-radius: 10px;
-            border: 2px solid #f0f7ff; /* Creates a gap around the thumb */
+            border: 2px solid #f0f7ff;
         }
-
 
         body {
             background: var(--background-color);
@@ -64,6 +64,7 @@
             top: 0;
             width: 100%;
             z-index: 100;
+            transition: all 0.3s ease;
         }
 
         .header-container {
@@ -82,7 +83,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: transform 0.3s ease;
         }
+
+            .logo:hover {
+                transform: scale(1.05);
+            }
 
         .logo-image {
             height: 40px;
@@ -110,7 +116,7 @@
                 }
 
         .hero {
-            margin-top: 8rem; /* Adjusted to push the hero lower */
+            margin-top: 6rem;
             padding: 4rem 2rem;
             text-align: center;
             background-color: var(--primary-color);
@@ -119,9 +125,11 @@
             background-position: center;
             background-repeat: no-repeat;
             color: white;
-            border-radius: 2rem 2rem 2rem 2rem; /* Rounded top edges */
+            border-radius: 2rem;
             box-shadow: 0 4px 10px var(--shadow-color);
+            transition: all 0.3s ease;
         }
+
 
             .hero h1 {
                 font-size: 2.5rem;
@@ -213,16 +221,22 @@
         .info-section {
             padding: 3rem 2rem;
             background: var(--card-bg-color);
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             box-shadow: 0 1px 3px var(--shadow-color);
             border-radius: 1rem;
+            transition: all 0.3s ease;
         }
+
+            .info-section:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 8px var(--shadow-color);
+            }
 
             .info-section h2 {
                 text-align: center;
                 font-size: 2.5rem;
                 font-weight: 700;
-                margin-bottom: 2rem;
+                margin-bottom: 1.5rem;
                 color: var(--primary-color);
             }
 
@@ -248,12 +262,19 @@
                 padding: 0.5rem 1rem;
                 background-color: white;
                 border-radius: 0.5rem;
+                margin-bottom: 0.5rem;
+                transition: all 0.3s ease;
             }
+
+                .info-section li:hover {
+                    transform: translateX(5px);
+                    color: var(--primary-color);
+                }
 
         .section-divider {
             height: 2px;
-            background-color: var(--border-color);
-            margin: 2rem auto;
+            background-color: #ccc;
+            margin: 1.5rem auto;
             width: 80%;
             max-width: 800px;
         }
@@ -261,30 +282,41 @@
         footer {
             text-align: center;
             padding: 2rem;
-            background: var(--menu-bg-color);
-            margin-top: 4rem;
+            background: var(--footer-bg-color);
+            margin-top: 1rem;
             box-shadow: 0 -1px 3px var(--shadow-color);
         }
 
             footer p {
                 margin: 0.5rem 0;
+                transition: all 0.3s ease;
             }
 
             footer a {
                 color: var(--primary-color);
                 text-decoration: none;
-                transition: color 0.2s;
+                transition: all 0.3s ease;
+                padding: 0.3rem 0.5rem;
+                border-radius: 0.3rem;
             }
 
                 footer a:hover {
-                    text-decoration: underline;
+                    background-color: var(--primary-color);
+                    color: white;
                 }
 
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
         #kontakt {
-            display: flex; /* Enables flexbox */
-            flex-direction: column; /* Stacks content vertically by default */
-            align-items: center; /* Center content horizontally */
-            justify-content: center; /* Center content vertically */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             padding: 2rem;
             gap: 1rem;
@@ -296,17 +328,22 @@
             }
 
         .kontakt-content {
-            display: flex; /* Enables horizontal stacking */
-            align-items: center; /* Center vertically */
-            justify-content: center; /* Center horizontally */
-            gap: 2rem; /* Spacing between QR code and text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
         }
 
             .kontakt-content img {
                 width: 250px;
                 height: 250px;
                 object-fit: contain;
+                transition: all 0.3s ease;
             }
+
+                .kontakt-content img:hover {
+                    transform: scale(1.05);
+                }
 
             .kontakt-content div {
                 display: flex;
@@ -327,8 +364,13 @@
             .kontakt-content li {
                 font-size: 1.125rem;
                 margin: 0.5rem 0;
+                transition: all 0.3s ease;
             }
 
+                .kontakt-content li:hover {
+                    transform: translateX(5px);
+                    color: var(--primary-color);
+                }
 
         @media (max-width: 768px) {
             .header-container {
@@ -361,7 +403,7 @@
             }
 
             #kontakt {
-                flex-direction: column; /* Stack vertically on smaller screens */
+                flex-direction: column;
             }
 
             .kontakt-content {
@@ -407,179 +449,180 @@
         </div>
     </header>
 
-        <div class="hero">
-            <h1 id="hero-title">Dobrodošli na Stat&Mat</h1>
-            <p>Unaprijedite svoje znanje već danas!</p>
-            <div class="button-container" id="create-account-button">
-                <a href="/register" class="hero-button">Napravite račun</a>
-            </div>
+    <div class="hero">
+        <h1 id="hero-title">Dobrodošli na Stat&Mat</h1>
+        <p>Unaprijedite svoje znanje već danas!</p>
+        <div class="button-container" id="create-account-button">
+            <a href="/register" class="hero-button">Napravite račun</a>
+        </div>
+    </div>
+
+    <div class="subscription-container">
+        <div class="plan-box">
+            <h3>Matematika - prvi kolokvij</h3>
+            <button onclick="window.location.href='/Matematika1'">Saznaj više</button>
         </div>
 
-        <div class="subscription-container">
-            <div class="plan-box">
-                <h3>Matematika - prvi kolokvij</h3>
-                <button onclick="window.location.href='/Matematika1'">Saznaj više</button>
-            </div>
-
-            <div class="plan-box">
-                <h3>Matematika - drugi kolokvij</h3>
-                <button onclick="window.location.href='/Matematika2'">Saznaj više</button>
-            </div>
-
-            <div class="plan-box">
-                <h3>Statistika - prvi kolokvij</h3>
-                <button onclick="window.location.href='/Statistika1'">Saznaj više</button>
-            </div>
-
-            <div class="plan-box">
-                <h3>Statistika - drugi kolokvij</h3>
-                <button onclick="window.location.href='/Statistika2'">Saznaj više</button>
-            </div>
+        <div class="plan-box">
+            <h3>Matematika - drugi kolokvij</h3>
+            <button onclick="window.location.href='/Matematika2'">Saznaj više</button>
         </div>
 
-        <div class="section-divider"></div>
+        <div class="plan-box">
+            <h3>Statistika - prvi kolokvij</h3>
+            <button onclick="window.location.href='/Statistika1'">Saznaj više</button>
+        </div>
 
-        <section id="Onama" class="info-section">
-            <h2>O nama</h2>
-            <p>
-                Mi smo Jurica i Martin, studenti FER-a i FSB-a. Naša strast prema matematici i statistici, kao i želja da pomognemo kolegama, inspirirali su nas da pokrenemo ovu web stranicu. Naša misija je jednostavna: pomoći studentima Ekonomskog fakulteta (i svim drugim studentima koji se susreću s matematikom i statistikom) da lakše i efikasnije savladaju ove ključne discipline.
-            </p>
-        </section>
+        <div class="plan-box">
+            <h3>Statistika - drugi kolokvij</h3>
+            <button onclick="window.location.href='/Statistika2'">Saznaj više</button>
+        </div>
+    </div>
 
-        <div class="section-divider"></div>
+    <div class="section-divider"></div>
 
-        <section id="features" class="info-section">
-            <h2>Što možete očekivati?</h2>
-            <p>Osim samih videolekcija nudimo i druge načine pomaganja studentima:</p>
-            <ul>
-                <li>Objašnjavanje zadataka putem e-maila</li>
-                <li>Rješavanje zadataka koji nisu riješeni na portalu</li>
-                <li>Individualne konzultacije</li>
-                <li>Priprema za ispite</li>
-            </ul>
-        </section>
+    <section id="Onama" class="info-section">
+        <h2>O nama</h2>
+        <p>
+            Mi smo Jurica i Martin, studenti FER-a i FSB-a. Naša strast prema matematici i statistici, kao i želja da pomognemo kolegama, inspirirali su nas da pokrenemo ovu web stranicu. Naša misija je jednostavna: pomoći studentima Ekonomskog fakulteta (i svim drugim studentima koji se susreću s matematikom i statistikom) da lakše i efikasnije savladaju ove ključne discipline.
+        </p>
+    </section>
 
-        <div class="section-divider"></div>
+    <div class="section-divider"></div>
 
-        <section id="kontakt" class="info-section">
-            <h2>Kontakt</h2>
-            <div class="kontakt-content">
-                <div class="w-[150px] h-[150px]">
-                    <img src="/sprites/whatsapp.jpg"
-                         alt="QR Code"
-                         class="w-[150px] h-[150px] object-contain" />
-                </div>
-                <div>
-                    <p>Imate pitanja ili trebate pomoć?</p>
-                    <ul>
-                        <li>E-mail: statandmat@gmail.hr</li>
-                        <li>Whatsapp: +385 98 167 4727</li>
-                    </ul>
-                </div>
+    <section id="features" class="info-section">
+        <h2>Što možete očekivati?</h2>
+        <p>Osim samih videolekcija nudimo i druge načine pomaganja studentima:</p>
+        <ul>
+            <li>Objašnjavanje zadataka putem e-maila</li>
+            <li>Rješavanje zadataka koji nisu riješeni na portalu</li>
+            <li>Individualne konzultacije</li>
+            <li>Priprema za ispite</li>
+        </ul>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="kontakt" class="info-section">
+        <h2>Kontakt</h2>
+        <div class="kontakt-content">
+            <div class="w-[150px] h-[150px]">
+                <img src="/sprites/whatsapp.jpg"
+                     alt="QR Code"
+                     class="w-[150px] h-[150px] object-contain" />
             </div>
-        </section>
+            <div>
+                <p>Imate pitanja ili trebate pomoć?</p>
+                <ul>
+                    <li>E-mail: statandmat@gmail.hr</li>
+                    <li>Whatsapp: +385 98 167 4727</li>
+                </ul>
+            </div>
+        </div>
+    </section>
 
-        <footer>
-            <p>&copy; 2024 Stat&Mat. Sva prava pridržana.</p>
-            <p>
-                <a href="#Onama">O nama</a> |
-                <a href="#features">Što možete očekivati?</a> |
-                <a href="#kontakt">Kontakt</a>
-            </p>
-        </footer>
+    <div class="section-divider"></div>
 
-        <script>
-            // Check if user is logged in
-            fetch('/api/check-login')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.loggedIn) {
-                        const username = data.username;
-                        document.querySelector('.hero h1').textContent = `Dobrodošli natrag, ${username}`;
-                        document.querySelector('.hero-button').style.display = 'none';
-                        document.getElementById('logout-link').style.display = 'inline';
-                        document.getElementById('login-link').style.display = 'none';
-                        document.getElementById('register-link').style.display = 'none';
+    <footer>
+        <p>&copy; 2024 Stat&Mat. Sva prava pridržana.</p>
+        <div class="footer-links">
+            <a href="#Onama">O nama</a>
+            <a href="#features">Što možete očekivati?</a>
+            <a href="#kontakt">Kontakt</a>
+        </div>
+    </footer>
 
-                        //check if user is subscribed to Matematika - prvi kol
-                        fetch('/api/subscription-status1')
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch subscription status');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.isSubscribed1) {
-                                    document.getElementById('Matematika_prvi_kol-link').style.display = 'inline';
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
+    <script>
+        // Check if user is logged in
+        fetch('/api/check-login')
+            .then(response => response.json())
+            .then(data => {
+                if (data.loggedIn) {
+                    const username = data.username;
+                    document.querySelector('.hero h1').textContent = Dobrodošli natrag, ${ username };
+                    document.querySelector('.hero-button').style.display = 'none';
+                    document.getElementById('logout-link').style.display = 'inline';
+                    document.getElementById('login-link').style.display = 'none';
+                    document.getElementById('register-link').style.display = 'none';
 
-                        //check if user is subscribed to Matematika - drugi kol
-                        fetch('/api/subscription-status2')
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch subscription status');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.isSubscribed2) {
-                                    document.getElementById('Matematika_drugi_kol-link').style.display = 'inline';
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking login status:', error);
-                });
-
-            // Logout function
-            document.getElementById('logout-link').addEventListener('click', function (event) {
-                event.preventDefault();
-
-                fetch('/api/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            alert('Odjava uspješna!');
-                            window.location.href = '/';
-                        } else {
-                            alert('Odjava nije uspjela. Molimo pokušajte ponovno.');
-                        }
-                    })
-                    .catch(error => console.error('Greška tijekom odjave:', error));
-            });
-
-            // Smooth scroll for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href').substring(1);
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        const headerOffset = 80; // Adjust this value based on your header height
-                        const elementPosition = targetElement.getBoundingClientRect().top;
-                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                        window.scrollTo({
-                            top: offsetPosition,
-                            behavior: 'smooth'
+                    //check if user is subscribed to Matematika - prvi kol
+                    fetch('/api/subscription-status1')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch subscription status');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.isSubscribed1) {
+                                document.getElementById('Matematika_prvi_kol-link').style.display = 'inline';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
                         });
-                    }
-                });
+
+                    //check if user is subscribed to Matematika - drugi kol
+                    fetch('/api/subscription-status2')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch subscription status');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.isSubscribed2) {
+                                document.getElementById('Matematika_drugi_kol-link').style.display = 'inline';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
             });
-        </script>
+
+        // Logout function
+        document.getElementById('logout-link').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Odjava uspješna!');
+                        window.location.href = '/';
+                    } else {
+                        alert('Odjava nije uspjela. Molimo pokušajte ponovno.');
+                    }
+                })
+                .catch(error => console.error('Greška tijekom odjave:', error));
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    const headerOffset = 80; // Adjust this value based on your header height
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
