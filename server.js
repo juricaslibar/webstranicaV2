@@ -166,6 +166,7 @@ passport.use(
                     // Register the new device
                     user.devices.push({ ip: encryptedIP, userAgent: userAgent });
                     await user.save();
+                    return done(null, userId);
                 }
 
                 return done(null, userId); // Pass user ID for session
@@ -460,16 +461,6 @@ app.post('/api/login', async (req, res) => {
         for (const dev of device) {
             if (!dev) continue;
 
-            if (decrypt(dev.ip) !== ip && device.length < 2) {
-                user.devices.push({ ip: encryptedIP, userAgent });
-                await user.save();
-                req.session.username = user.name;
-
-                await req.session.save(); // Ensure the session is saved
-                sessionSet = true;
-                return res.json({ message: 'Uspješna prijava', redirect: '/' });
-            }
-
             if (dev.userAgent !== userAgent && device.length < 2) {
                 user.devices.push({ ip: encryptedIP, userAgent });
                 await user.save();
@@ -480,9 +471,9 @@ app.post('/api/login', async (req, res) => {
                 return res.json({ message: 'Uspješna prijava', redirect: '/' });
             }
 
-            if (decrypt(dev.ip) === ip && dev.userAgent === userAgent) {
+            if (dev.userAgent === userAgent) {
                 req.session.username = user.name;
-
+                
                 await req.session.save(); // Ensure the session is saved
                 sessionSet = true;
                 return res.json({ message: 'Uspješna prijava', redirect: '/' });
