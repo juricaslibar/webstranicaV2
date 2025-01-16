@@ -330,8 +330,6 @@ app.get('/confirmation/:token', async (req, res) => {
         // Verify token
         const { username } = jwt.verify(req.params.token, process.env.EMAIL_SECRET);
 
-        const users = readUsers();
-
         // Check if the user exists
         User.findOne({ name: username })
             .then(present => {
@@ -369,10 +367,10 @@ app.post('/resend-email', async (req, res) => {
                     return res.status(400).json({ error: 'Email address not found or already confirmed.' });
                 }
 
-
+                username = present.name;
                 // Generate email token
                 const emailToken = jwt.sign(
-                    { username: present.username },
+                    { username },
                     process.env.EMAIL_SECRET,
                     { expiresIn: '1d' }
                 );
