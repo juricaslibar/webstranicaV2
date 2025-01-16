@@ -10,7 +10,7 @@
 
     <style>
         :root {
-            --primary-color: #3b82f6;
+            --primary-color: #2563eb;
             --secondary-color: #1d4ed8;
             --background-color: #E8E8E8;
             --text-color: #1e293b;
@@ -119,7 +119,7 @@
             margin-top: 6rem;
             padding: 4rem 2rem;
             text-align: center;
-            background-color: var(--primary-color);
+            background-color: var(--secondary-color);
             background-image: url('/sprites/hero.background4.jpg');
             background-size: cover;
             background-position: center;
@@ -380,22 +380,49 @@
 
             nav {
                 margin-top: 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
-            .hero h1 {
-                font-size: 2rem;
+                nav a {
+                    margin: 0.25rem;
+                }
+
+            .hero {
+                margin-top: 9rem; /* Updated margin-top */
+                padding: 2rem 1rem;
             }
 
-            .hero p {
-                font-size: 1rem;
-            }
+                .hero h1 {
+                    font-size: 1.75rem;
+                }
+
+                .hero p {
+                    font-size: 1rem;
+                }
 
             .button-container {
                 flex-direction: column;
             }
 
+            .hero-button {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .subscription-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .plan-box {
+                width: 100%;
+                max-width: 300px;
+            }
+
             .info-section h2 {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
 
             .info-section p, .info-section li {
@@ -403,7 +430,7 @@
             }
 
             #kontakt {
-                flex-direction: column;
+                padding: 1rem;
             }
 
             .kontakt-content {
@@ -412,21 +439,51 @@
             }
 
                 .kontakt-content img {
-                    width: 100%;
-                    height: auto;
+                    width: 200px;
+                    height: 200px;
                 }
 
                 .kontakt-content div {
                     text-align: center;
                 }
 
-                .kontakt-content p {
+                .kontakt-content p, .kontakt-content li {
                     font-size: 1rem;
                 }
 
-                .kontakt-content li {
-                    font-size: 1rem;
-                }
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .desktop-only {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .info-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .kontakt-content img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .desktop-only {
+                display: inline;
+            }
         }
     </style>
 </head>
@@ -438,7 +495,8 @@
                 Stat&Mat
             </a>
             <nav>
-                <a href="#Onama">O nama</a>
+                <a href="#Onama" class="desktop-only">O nama</a>
+                <a href="#features" class="desktop-only">Što možete očekivati</a>
                 <a href="#kontakt">Kontakt</a>
                 <a href="/register" id="register-link">Registracija</a>
                 <a href="/login" id="login-link">Prijava</a>
