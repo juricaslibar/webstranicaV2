@@ -11,7 +11,7 @@
             --secondary-color: #1d4ed8;
             --success-color: #059669;
             --error-color: #dc2626;
-            --background-color: #f8fafc;
+            --background-color: #E8E8E8;
             --text-color: #1e293b;
             --border-color: #e2e8f0;
         }
@@ -26,84 +26,55 @@
         body {
             background: var(--background-color);
             color: var(--text-color);
-            line-height: 1.5;
-            min-height: 100vh;
             display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: white;
-            padding: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .logo-image {
-            height: 50px; /* Adjust as needed */
-            vertical-align: middle; /* Align with text */
-        }
-
-        .main-container {
-            margin-top: 5rem;
-            flex: 1;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 2rem;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .split-container {
-            display: flex;
-            max-width: 1000px;
+        .container {
+            max-width: 600px;
             width: 100%;
             background: white;
             border-radius: 1rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        .info-section {
-            flex: 1;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        .header {
+            padding: 1rem;
+            background: var(--primary-color);
             color: white;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            position: relative;
+        }
+
+            .header a {
+                text-decoration: none;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+        .logo-image {
+            height: 40px;
         }
 
         .form-section {
-            flex: 1;
-            padding: 3rem;
-            min-width: 320px;
+            padding: 2rem;
+            transition: all 0.3s ease-in-out;
         }
 
-        h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: var(--text-color);
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
 
         .form-group {
@@ -114,7 +85,6 @@
             display: block;
             font-weight: 500;
             margin-bottom: 0.5rem;
-            color: var(--text-color);
         }
 
         input {
@@ -129,7 +99,7 @@
             input:focus {
                 outline: none;
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
             }
 
         button {
@@ -142,93 +112,57 @@
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+            button::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient( 120deg, transparent, rgba(255, 255, 255, 0.3), transparent );
+                transition: all 0.6s;
+            }
+
+            button:hover::before {
+                left: 100%;
+            }
 
             button:hover {
                 background: var(--secondary-color);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             }
-
-        .error-message {
-            color: var(--error-color);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .success-message {
-            color: var(--success-color);
-            text-align: center;
-            display: none;
-            padding: 0.75rem;
-            background: #ecfdf5;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #64748b;
-        }
-
-            .login-link a {
-                color: var(--primary-color);
-                text-decoration: none;
-                font-weight: 500;
-            }
-
-                .login-link a:hover {
-                    text-decoration: underline;
-                }
-        .social-login {
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .or-divider {
-            margin: 1rem 0;
-            color: var(--text-color);
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
 
         .google-login-btn {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1rem;
+            gap: 0.5rem;
+            padding: 0.75rem;
             background: #ea4335;
             color: white;
             border: none;
             border-radius: 0.5rem;
             font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
+            font-weight: bold;
             cursor: pointer;
+            text-align: center;
             transition: background-color 0.2s;
-            width: 100%; /* Full width */
-            max-width: 400px; /* Limit width */
-            margin: 0 auto; /* Center alignment */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
             .google-login-btn:hover {
                 background: #c53929;
-                text-decoration: none;
-            }
-
-            .google-login-btn i {
-                margin-right: 0.5rem;
-                font-size: 1.25rem;
             }
 
         .divider {
             display: flex;
             align-items: center;
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
+            margin: 1.5rem 0;
             color: var(--text-color);
             font-size: 0.875rem;
         }
@@ -249,80 +183,86 @@
                 margin-left: 0.5rem;
             }
 
-            .divider span {
-                display: inline-block;
-                background: white; /* Match the form-section background */
-                padding: 0 0.5rem;
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-color);
+        }
+
+            .register-link a {
+                color: var(--primary-color);
+                font-weight: bold;
+                text-decoration: none;
             }
 
-        @media (max-width: 768px) {
-            .info-section {
-                display: none; /* Hide the info section on small screens */
+                .register-link a:hover {
+                    text-decoration: underline;
+                }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            text-align: center;
+            display: none;
+            padding: 0.75rem;
+            background: #ecfdf5;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
             }
 
-            .form-section {
-                flex: 1 0 100%; /* Make form section take full width */
+            to {
+                opacity: 1;
             }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <a href="/" class="logo">
+    <div class="container">
+        <div class="header">
+            <a href="/">
                 <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
-                Stat&Mat
+                <span>Stat&Mat</span>
             </a>
         </div>
-    </header>
-
-    <main class="main-container">
-        <div class="split-container">
-            <div class="info-section">
-                <h1>Dobrodošli natrag!</h1>
-                <p>Prijavi se za nastavak učenja!</p>
-            </div>
-
-            <div class="form-section">
-                <h1>Prijava</h1>
-                <form id="loginForm" class="login-form">
-                    <div class="form-group">
-                        <label for="userInput">Korisničko ime ili Email</label>
-                        <input type="text"
-                               id="userInput"
-                               name="userInput"
-                               autocomplete="username"
-                               required>
-                        <div class="error-message" id="userInput-error"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Lozinka</label>
-                        <input type="password"
-                               id="password"
-                               name="password"
-                               autocomplete="current-password"
-                               required>
-                        <div class="error-message" id="password-error"></div>
-                    </div>
-                    <button type="submit">Prijavi se</button>
-                    <div class="success-message" id="success-message"></div>
-                </form>
-
-                <div class="divider">
-                    <span>ili</span>
+        <div class="form-section">
+            <h2 class="form-title">Prijava</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="userInput">Korisničko ime ili Email</label>
+                    <input type="text" id="userInput" name="userInput" required placeholder="Unesite korisničko ime ili email">
+                    <div class="error-message" id="userInput-error"></div>
                 </div>
-
-                <!-- "Login with Google" button -->
-                <a href="/auth/google" class="google-login-btn">
-                    <i class="fab fa-google"></i> Prijava putem Google-a
-                </a>
-
-                <div class="login-link">
-                    Još uvijek nemaš račun? <a href="/register">Registriraj se</a>
+                <div class="form-group">
+                    <label for="password">Lozinka</label>
+                    <input type="password" id="password" name="password" required placeholder="Unesite lozinku">
+                    <div class="error-message" id="password-error"></div>
                 </div>
+                <button type="submit">Prijavi se</button>
+                <div class="success-message" id="success-message"></div>
+            </form>
+
+            <div class="divider">ili</div>
+
+            <button class="google-login-btn" onclick="window.location.href='/auth/google'">
+                <i class="fab fa-google"></i> Prijava putem Google
+            </button>
+
+            <div class="register-link">
+                Još uvijek nemaš račun? <a href="/register">Registriraj se</a>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
         // Function to get device ID from localStorage
@@ -379,15 +319,15 @@
                     if (data.error === 'Maximum device limit reached') {
                         // Create a more detailed error message with device info
                         let errorMessage = `
-                                    <div class="device-limit-error">
-                                        <p><strong>${data.message}</strong></p>
-                                        <p>Currently registered devices:</p>
-                                        <div class="device-list">
-                                            ${formatDeviceList(data.devices)}
+                                        <div class="device-limit-error">
+                                            <p><strong>${data.message}</strong></p>
+                                            <p>Currently registered devices:</p>
+                                            <div class="device-list">
+                                                ${formatDeviceList(data.devices)}
+                                            </div>
+                                            <p>Please use one of your registered devices to log in.</p>
                                         </div>
-                                        <p>Please use one of your registered devices to log in.</p>
-                                    </div>
-                                `;
+                                    `;
                         errorDiv.innerHTML = errorMessage;
                     } else {
                         errorDiv.textContent = data.error;
@@ -406,3 +346,4 @@
     </script>
 </body>
 </html>
+
