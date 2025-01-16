@@ -131,7 +131,7 @@ passport.use(
                 const userAgent = req.session ? getClientInfo(req).userAgent : null;
                 const encryptedIP = ip ? encrypt(ip) : null;
 
-                let user = await User.findOne({ name: userId });
+                let user = await User.findOne({ email: email });
 
                 if (!user) {
                     // Create a new user if not found
