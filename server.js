@@ -372,7 +372,7 @@ app.post('/resend-email', async (req, res) => {
 
                 // Generate email token
                 const emailToken = jwt.sign(
-                    { username: user.username },
+                    { username: present.username },
                     process.env.EMAIL_SECRET,
                     { expiresIn: '1d' }
                 );
