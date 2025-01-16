@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matematika - Drugi Kolokvij</title>
+    <title>Matematika - Prvi Kolokvij</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -41,6 +41,19 @@
             max-width: 700px;
             text-align: center;
             transition: transform 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .container:hover {
@@ -105,6 +118,7 @@
         .lesson-list {
             text-align: left;
             margin-bottom: 20px;
+            list-style-position: inside;
         }
 
         .lesson-list li {
@@ -123,10 +137,58 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* Added styles for logo and company name */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-link:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 600px) {
+            .logo-image {
+                width: 50px;
+                height: 50px;
+            }
+            .company-name {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="logo-container">
+            <a href="/" class="logo-link">
+                <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
+                <span class="company-name">Stat&Mat</span>
+            </a>
+        </div>
+
         <h1>Matematika - Prvi Kolokvij</h1>
         
         <p class="price">Cijena: €20.00</p>
@@ -138,29 +200,26 @@
         <h2>Sadržaj videolekcija</h2>
         <ul class="lesson-list">
             <li><strong>Matrice:</strong> Naučite sve o matričnim operacijama, determinantama i njihovoj primjeni u rješavanju sustava linearnih jednadžbi.</li>
-            <li><strong>Funkcije jedne varijable:</strong> Explore functions of a single variable, including limits, continuity, and differentiation.</li>
+            <li><strong>Funkcije jedne varijable:</strong> Istražite funkcije jedne varijable, uključujući limite, kontinuitet i diferencijaciju.</li>
         </ul>
         
         <h2>Trajanje videolekcija</h2>
         <p>Ukupno trajanje lekcija: <strong>30 sati</strong></p>
                 
-
-        <h2 style="color: red;">Informacije o plačanju</h2>
-         <p>
+        <h2 style="color: red;">Informacije o plaćanju</h2>
+        <p>
             Korištenje Stripe-a omogućuje sigurnu obradu uplata na našoj web stranici. Stripe je pružatelj usluga za online plaćanje koji pruža visoke sigurnosne standarde za zaštitu podataka kupaca.
-           </p>
-           <p>
-           Možete birati između različitih načina plaćanja, uključujući kartično plaćanje (Visa, Mastercard, American Express) i druge metode koje Stripe omogućava. 
+        </p>
+        <p>
+            Možete birati između različitih načina plaćanja, uključujući kartično plaćanje (Visa, Mastercard, American Express) i druge metode koje Stripe omogućava. 
         </p>
         <p style="color: red; font-weight: bold;">  
-    Naša usluga omogućava pristup sadržaju s najviše dva uređaja po korisničkom računu.  
-    Dijeljenje računa s više od dva uređaja nije dopušteno kako bismo zaštitili autorska prava i omogućili pošteno korištenje.
-</p>
-    <form action="/checkout1" method="post">
+            Naša usluga omogućava pristup sadržaju s najviše dva uređaja po korisničkom računu.  
+            Dijeljenje računa s više od dva uređaja nije dopušteno kako bismo zaštitili autorska prava i omogućili pošteno korištenje.
+        </p>
+        <form action="/checkout1" method="post">
             <button type="submit" class="buy-button">AKTIVIRAJ</button>
         </form>
-
     </div>
 </body>
 </html>
-
