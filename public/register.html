@@ -3,476 +3,365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account | Learning Platform</title>
+    <title>Registracija</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1d4ed8;
-            --success-color: #059669;
-            --error-color: #dc2626;
-            --background-color: #f8fafc;
-            --text-color: #1e293b;
-            --border-color: #e2e8f0;
-        }
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Registracija</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            :root {
+                --primary-color: #2563eb;
+                --secondary-color: #1d4ed8;
+                --success-color: #059669;
+                --error-color: #dc2626;
+                --background-color: #E8E8E8;
+                --text-color: #1e293b;
+                --border-color: #e2e8f0;
+            }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            }
 
-        body {
-            background: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+            body {
+                background: var(--background-color);
+                color: var(--text-color);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
 
-        .header {
-            background: white;
-            padding: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-        }
+            .container {
+                max-width: 600px;
+                width: 100%;
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                animation: fadeIn 0.5s ease-in-out;
+            }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            .header {
+                padding: 1rem;
+                background: var(--primary-color);
+                color: white;
+                text-align: center;
+                font-size: 1.5rem;
+                font-weight: 700;
+                position: relative;
+            }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .logo-image {
-            height: 50px; /* Adjust as needed */
-            vertical-align: middle; /* Align with text */
-        }
+                .header a {
+                    text-decoration: none;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                }
 
-        .main-container {
-            margin-top: 5rem;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
+            .logo-image {
+                height: 40px;
+            }
 
-        .split-container {
-            display: flex;
-            max-width: 1000px;
-            width: 100%;
-            background: white;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+            .form-section {
+                padding: 2rem;
+                transition: all 0.3s ease-in-out;
+            }
 
-        .info-section {
-            flex: 1;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 3rem;
-            display: none;
-        }
+            .form-title {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
 
-        .form-section {
-            flex: 1;
-            padding: 3rem;
-            min-width: 320px;
-        }
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
 
-        @media (min-width: 768px) {
-            .info-section {
+            label {
                 display: block;
-            }
-        }
-
-        h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: var(--text-color);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        button {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        button:hover {
-            background: var(--secondary-color);
-        }
-
-        .error-message {
-            color: var(--error-color);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .success-message {
-            color: var(--success-color);
-            text-align: center;
-            display: none;
-            padding: 0.75rem;
-            background: #ecfdf5;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #64748b;
-        }
-
-        .login-link a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .features-list {
-            margin-top: 2rem;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-icon {
-            background: rgba(255, 255, 255, 0.2);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feature-text {
-            font-size: 1rem;
-        }
-
-        .feature-text h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .feature-text p {
-            opacity: 0.9;
-            font-size: 0.875rem;
-        }
-
-        .google-login-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1rem;
-            background: #ea4335;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            width: 100%; /* Full width */
-            max-width: 400px; /* Limit width */
-            margin: 0 auto; /* Center alignment */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-            .google-login-btn:hover {
-                background: #c53929;
-                text-decoration: none;
+                font-weight: 500;
+                margin-bottom: 0.5rem;
             }
 
-            .google-login-btn i {
-                margin-right: 0.5rem;
-                font-size: 1.25rem;
+            input {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: 1px solid var(--border-color);
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                transition: border-color 0.2s;
             }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
-            color: var(--text-color);
-            font-size: 0.875rem;
-        }
+                input:focus {
+                    outline: none;
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+                }
 
-            .divider::before,
-            .divider::after {
-                content: "";
-                flex: 1;
-                height: 1px;
-                background: var(--border-color);
+            button {
+                width: 100%;
+                padding: 0.875rem;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
             }
 
-            .divider::before {
-                margin-right: 0.5rem;
+                button::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient( 120deg, transparent, rgba(255, 255, 255, 0.3), transparent );
+                    transition: all 0.6s;
+                }
+
+                button:hover::before {
+                    left: 100%;
+                }
+
+                button:hover {
+                    background: var(--secondary-color);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                }
+
+            .google-login-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.75rem;
+                background: #ea4335;
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                font-weight: bold;
+                cursor: pointer;
+                text-align: center;
+                transition: background-color 0.2s;
             }
 
-            .divider::after {
-                margin-left: 0.5rem;
+                .google-login-btn:hover {
+                    background: #c53929;
+                }
+
+            .divider {
+                display: flex;
+                align-items: center;
+                margin: 1.5rem 0;
+                color: var(--text-color);
+                font-size: 0.875rem;
             }
 
-            .divider span {
-                display: inline-block;
-                background: white; /* Match the form-section background */
-                padding: 0 0.5rem;
+                .divider::before,
+                .divider::after {
+                    content: "";
+                    flex: 1;
+                    height: 1px;
+                    background: var(--border-color);
+                }
+
+                .divider::before {
+                    margin-right: 0.5rem;
+                }
+
+                .divider::after {
+                    margin-left: 0.5rem;
+                }
+
+            .login-link {
+                text-align: center;
+                margin-top: 1.5rem;
+                color: var(--text-color);
             }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="header-content">
-            <a href="/" class="logo">
-                <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
-                Stat&Mat
-            </a>
-        </div>
-    </header>
 
-    <main class="main-container">
-        <div class="split-container">
-            <div class="info-section">
-                <h1>Start Your Learning Journey</h1>
-                <p>Join our community of learners and unlock your potential</p>
+                .login-link a {
+                    color: var(--primary-color);
+                    font-weight: bold;
+                    text-decoration: none;
+                }
 
-                <div class="features-list">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h3>Rich Content Library</h3>
-                            <p>Access thousands of courses and learning materials</p>
-                        </div>
-                    </div>
+                    .login-link a:hover {
+                        text-decoration: underline;
+                    }
 
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h3>Community Support</h3>
-                            <p>Learn together with peers and expert mentors</p>
-                        </div>
-                    </div>
+            .error-message {
+                color: var(--error-color);
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+                display: none;
+            }
 
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-certificate"></i>
-                        </div>
-                        <div class="feature-text">
-                            <h3>Earn Certificates</h3>
-                            <p>Get recognized for your achievements</p>
-                        </div>
-                    </div>
-                </div>
+            .success-message {
+                color: var(--success-color);
+                text-align: center;
+                display: none;
+                padding: 0.75rem;
+                background: #ecfdf5;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="header">
+                <a href="/">
+                    <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
+                    <span>Stat&Mat</span>
+                </a>
             </div>
-
             <div class="form-section">
-                <h1>Create Account</h1>
-                <form id="registerForm" class="register-form">
+                <h2 class="form-title">Registracija</h2>
+                <form id="registerForm">
                     <div class="form-group">
                         <label for="username">Korisničko ime</label>
-                        <input type="text"
-                               id="username"
-                               name="username"
-                               autocomplete="username"
-                               required>
+                        <input type="text" id="username" name="username" required placeholder="Unesite korisničko ime">
                         <div class="error-message" id="username-error"></div>
                     </div>
-
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email"
-                               id="email"
-                               name="email"
-                               autocomplete="email"
-                               required>
+                        <input type="email" id="email" name="email" required placeholder="Unesite email adresu">
                         <div class="error-message" id="email-error"></div>
                     </div>
-
                     <div class="form-group">
                         <label for="password">Lozinka</label>
-                        <input type="password"
-                               id="password"
-                               name="password"
-                               autocomplete="new-password"
-                               required>
+                        <input type="password" id="password" name="password" required placeholder="Unesite lozinku">
                         <div class="error-message" id="password-error"></div>
                     </div>
-
                     <div class="form-group">
                         <label for="repeat_password">Ponovi lozinku</label>
-                        <input type="password"
-                               id="repeat_password"
-                               name="repeat_password"
-                               required>
+                        <input type="password" id="repeat_password" name="repeat_password" required placeholder="Ponovite lozinku">
                         <div class="error-message" id="repeat-password-error"></div>
                     </div>
-
-                    <button type="submit">Create Account</button>
+                    <button type="submit">Registriraj se</button>
                     <div class="success-message" id="success-message"></div>
                 </form>
 
+                <div class="divider">ili</div>
 
-                <div class="divider">
-                    <span>ili</span>
+                <div>
+                    <button class="google-login-btn" onclick="window.location.href='/auth/google'">
+                        <i class="fab fa-google"></i> Registracija putem Google
+                    </button>
                 </div>
-
-                <!-- "Login with Google" button -->
-                <a href="/auth/google" class="google-login-btn">
-                    <i class="fab fa-google"></i> Prijava putem Google-a
-                </a>
 
                 <div class="login-link">
                     Već imaš račun? <a href="/login">Prijavi se</a>
                 </div>
             </div>
         </div>
-    </main>
-    <script>
-        // Function to save device ID to localStorage
-        const saveDeviceId = (deviceId) => localStorage.setItem('deviceId', deviceId);
 
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        <script>
+            // Function to save device ID to localStorage
+            const saveDeviceId = (deviceId) => localStorage.setItem('deviceId', deviceId);
 
-            // Reset error states
-            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
-            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const repeatPassword = document.getElementById('repeat_password').value;
+                // Reset error states
+                document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+                document.getElementById('success-message').style.display = 'none';
 
-            // Password validation: at least 6 characters long and contains at least one number
-            const passwordRegex = /^(?=.*[0-9])(?=.{6,})/;
-            if (!passwordRegex.test(password)) {
-                document.getElementById('password-error').textContent = 'Lozinka mora imati barem 6 znakova i sadržavati 1 broj.';
-                document.getElementById('password-error').style.display = 'block';
-                document.getElementById('password').classList.add('error');
-                return;
-            }
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const repeatPassword = document.getElementById('repeat_password').value;
 
-            // Check if repeatPassword matches password
-            if (password !== repeatPassword) {
-                document.getElementById('repeat-password-error').textContent = 'Lozinke nisu iste.';
-                document.getElementById('repeat-password-error').style.display = 'block';
-                document.getElementById('repeat_password').classList.add('error');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Save device ID from registration
-                    if (data.deviceId) {
-                        saveDeviceId(data.deviceId);
-                    }
-
-                    const successMessage = document.getElementById('success-message');
-                    successMessage.textContent = 'Registration successful! Redirecting...';
-                    successMessage.style.display = 'block';
-                    setTimeout(() => {
-                        window.location.href = '/load';
-                    }, 1000);
-                } else {
-                    if (data.error.includes('Username')) {
-                        document.getElementById('username-error').textContent = data.error;
-                        document.getElementById('username-error').style.display = 'block';
-                        document.getElementById('username').classList.add('error');
-                    } else if (data.error.includes('Email')) {
-                        document.getElementById('email-error').textContent = data.error;
-                        document.getElementById('email-error').style.display = 'block';
-                        document.getElementById('email').classList.add('error');
-                    } else {
-                        document.getElementById('password-error').textContent = data.error;
-                        document.getElementById('password-error').style.display = 'block';
-                        document.getElementById('password').classList.add('error');
-                    }
+                // Password validation: at least 6 characters long and contains at least one number
+                const passwordRegex = /^(?=.*[0-9])(?=.{6,})/;
+                if (!passwordRegex.test(password)) {
+                    document.getElementById('password-error').textContent = 'Lozinka mora imati barem 6 znakova i sadržavati 1 broj.';
+                    document.getElementById('password-error').style.display = 'block';
+                    document.getElementById('password').classList.add('error');
+                    return;
                 }
-            } catch (error) {
-                console.error('Registration error:', error);
-                document.getElementById('password-error').textContent = 'An error occurred. Please try again.';
-                document.getElementById('password-error').style.display = 'block';
-            }
-        });
-    </script>
+
+                // Check if repeatPassword matches password
+                if (password !== repeatPassword) {
+                    document.getElementById('repeat-password-error').textContent = 'Lozinke nisu iste.';
+                    document.getElementById('repeat-password-error').style.display = 'block';
+                    document.getElementById('repeat_password').classList.add('error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Save device ID from registration
+                        if (data.deviceId) {
+                            saveDeviceId(data.deviceId);
+                        }
+
+                        const successMessage = document.getElementById('success-message');
+                        successMessage.textContent = 'Registration successful! Redirecting...';
+                        successMessage.style.display = 'block';
+                        setTimeout(() => {
+                            window.location.href = '/load';
+                        }, 1000);
+                    } else {
+                        if (data.error.includes('Username')) {
+                            document.getElementById('username-error').textContent = data.error;
+                            document.getElementById('username-error').style.display = 'block';
+                            document.getElementById('username').classList.add('error');
+                        } else if (data.error.includes('Email')) {
+                            document.getElementById('email-error').textContent = data.error;
+                            document.getElementById('email-error').style.display = 'block';
+                            document.getElementById('email').classList.add('error');
+                        } else {
+                            document.getElementById('password-error').textContent = data.error;
+                            document.getElementById('password-error').style.display = 'block';
+                            document.getElementById('password').classList.add('error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    document.getElementById('password-error').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('password-error').style.display = 'block';
+                }
+            });
+        </script>
     </body>
 </html>
