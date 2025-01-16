@@ -41,6 +41,19 @@
             max-width: 700px;
             text-align: center;
             transition: transform 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .container:hover {
@@ -105,6 +118,7 @@
         .lesson-list {
             text-align: left;
             margin-bottom: 20px;
+            list-style-position: inside;
         }
 
         .lesson-list li {
@@ -131,37 +145,33 @@
         
         <p class="price">Cijena: €20.00</p>
         <p>
-            Pripremite se za prvi kolokvij iz matematike s našim sveobuhvatnim materijalom za učenje. 
+            Pripremite se za drugi kolokvij iz matematike s našim sveobuhvatnim materijalom za učenje. 
             Ovaj paket je osmišljen kako bi vam pomogao u savladavanju gradiva i briljiranju u vašem kolegiju matematike.
         </p>
         
         <h2>Sadržaj videolekcija</h2>
         <ul class="lesson-list">
             <li><strong>Matrice:</strong> Naučite sve o matričnim operacijama, determinantama i njihovoj primjeni u rješavanju sustava linearnih jednadžbi.</li>
-            <li><strong>Funkcije jedne varijable:</strong> Explore functions of a single variable, including limits, continuity, and differentiation.</li>
+            <li><strong>Funkcije jedne varijable:</strong> Istražite funkcije jedne varijable, uključujući limite, kontinuitet i diferencijaciju.</li>
         </ul>
         
         <h2>Trajanje videolekcija</h2>
         <p>Ukupno trajanje lekcija: <strong>30 sati</strong></p>
-        
-        
-
-        <h2 style="color: red;">Informacije o plačanju</h2>
-         <p>
+                
+        <h2 style="color: red;">Informacije o plaćanju</h2>
+        <p>
             Korištenje Stripe-a omogućuje sigurnu obradu uplata na našoj web stranici. Stripe je pružatelj usluga za online plaćanje koji pruža visoke sigurnosne standarde za zaštitu podataka kupaca.
-           </p>
-           <p>
-           Možete birati između različitih načina plaćanja, uključujući kartično plaćanje (Visa, Mastercard, American Express) i druge metode koje Stripe omogućava. 
+        </p>
+        <p>
+            Možete birati između različitih načina plaćanja, uključujući kartično plaćanje (Visa, Mastercard, American Express) i druge metode koje Stripe omogućava. 
         </p>
         <p style="color: red; font-weight: bold;">  
-    Naša usluga omogućava pristup sadržaju s najviše dva uređaja po korisničkom računu.  
-    Dijeljenje računa s više od dva uređaja nije dopušteno kako bismo zaštitili autorska prava i omogućili pošteno korištenje.
-</p>
-    <form action="/checkout1" method="post">
+            Naša usluga omogućava pristup sadržaju s najviše dva uređaja po korisničkom računu.  
+            Dijeljenje računa s više od dva uređaja nije dopušteno kako bismo zaštitili autorska prava i omogućili pošteno korištenje.
+        </p>
+        <form action="/checkout2" method="post">
             <button type="submit" class="buy-button">AKTIVIRAJ</button>
         </form>
-
     </div>
 </body>
 </html>
-
