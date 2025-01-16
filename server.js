@@ -4,13 +4,13 @@ const dotenv = require('dotenv');
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const bcrypt = require('bcrypt'); 
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const session = require('express-session'); 
+const session = require('express-session');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
@@ -18,15 +18,15 @@ const User = require('./models/user');
 const axios = require('axios'); // CommonJS syntax
 const cors = require('cors');
 
-const app = express(); 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 
 const mongoURI = `${process.env.MONGODB_URI}`;
 mongoose.connect(mongoURI)
     .then(() => app.listen(PORT, () => console.log('Server started')))
-    .catch ((err) => console.log(err));
-     
+    .catch((err) => console.log(err));
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -63,7 +63,7 @@ const IV_LENGTH = 16;
 
 // Function to encrypt data
 const encrypt = (text) => {
-    const iv = crypto.randomBytes(IV_LENGTH); 
+    const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -93,7 +93,7 @@ const readUsers = async () => {
 };
 
 // Get client IP and user agent
-const getClientInfo = (req) => {  
+const getClientInfo = (req) => {
     const ip = req.ip ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
@@ -111,7 +111,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 
 app.use(passport.initialize());
-app.use(passport.session()); 
+app.use(passport.session());
 
 
 passport.use(
@@ -166,7 +166,6 @@ passport.use(
                     // Register the new device
                     user.devices.push({ ip: encryptedIP, userAgent: userAgent });
                     await user.save();
-                    return done(null, userId);
                 }
 
                 return done(null, userId); // Pass user ID for session
@@ -224,7 +223,7 @@ app.get(
         }
     }
 );
- 
+
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -263,7 +262,7 @@ app.post('/api/register', async (req, res) => {
 
         // Store username and device information
         const user = new User({
-            name: username, 
+            name: username,
             email: email,
             password: password,
             isConfirmed: false,
@@ -271,7 +270,7 @@ app.post('/api/register', async (req, res) => {
             isSubscribed2: false,
             devices: { ip: encryptedIP, userAgent },
         });
-         
+
         await user.save(); // Save the user to the database
 
         // Generate email token
@@ -328,10 +327,10 @@ app.post('/api/register', async (req, res) => {
 });
 
 
-app.get('/confirmation/:token', async (req, res) => { 
+app.get('/confirmation/:token', async (req, res) => {
     try {
         // Verify token
-        const { username } = jwt.verify(req.params.token, process.env.EMAIL_SECRET); 
+        const { username } = jwt.verify(req.params.token, process.env.EMAIL_SECRET);
 
         const users = readUsers();
 
@@ -373,21 +372,21 @@ app.post('/resend-email', async (req, res) => {
                 }
 
 
-        // Generate email token
-        const emailToken = jwt.sign(
-            { username: user.username },
-            process.env.EMAIL_SECRET,
-            { expiresIn: '1d' }
-        );
+                // Generate email token
+                const emailToken = jwt.sign(
+                    { username: user.username },
+                    process.env.EMAIL_SECRET,
+                    { expiresIn: '1d' }
+                );
 
-        const url = `${process.env.BASE_URL}/confirmation/${emailToken}`;
+                const url = `${process.env.BASE_URL}/confirmation/${emailToken}`;
 
-        // Send confirmation email
-        transporter.sendMail({
-            from: '"Stat&Mat" <your-email@gmail.com>',
-            to: email,
-            subject: 'Potvrda e-mail adrese',
-            html: `
+                // Send confirmation email
+                transporter.sendMail({
+                    from: '"Stat&Mat" <your-email@gmail.com>',
+                    to: email,
+                    subject: 'Potvrda e-mail adrese',
+                    html: `
 <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
     <div style="text-align: center; margin-bottom: 20px;">
         <img src="cid:logo" style="max-width: 150px;">
@@ -405,25 +404,25 @@ app.post('/resend-email', async (req, res) => {
     <p><strong>Vaš Tim</strong></p>
 </div>
 `,
-            attachments: [
-                {
-                    filename: 'logo.ico',
-                    path: './public/sprites/logo.ico', // Path to the logo file
-                    cid: 'logo' // Same as the cid used in the img src
-                }
-            ]
-        });
+                    attachments: [
+                        {
+                            filename: 'logo.ico',
+                            path: './public/sprites/logo.ico', // Path to the logo file
+                            cid: 'logo' // Same as the cid used in the img src
+                        }
+                    ]
+                });
 
-        res.json({
-            message: 'Confirmation email has been resent.',
-            url: url
-        });
+                res.json({
+                    message: 'Confirmation email has been resent.',
+                    url: url
+                });
             })
 
     } catch (error) {
         console.error('Error resending email:', error);
         res.status(500).json({ error: 'Server error' });
-    } 
+    }
 });
 
 app.post('/api/login', async (req, res) => {
@@ -471,9 +470,9 @@ app.post('/api/login', async (req, res) => {
                 return res.json({ message: 'Uspješna prijava', redirect: '/' });
             }
 
-            if (dev.userAgent === userAgent) {
+            if (decrypt(dev.ip) === ip && dev.userAgent === userAgent) {
                 req.session.username = user.name;
-                
+
                 await req.session.save(); // Ensure the session is saved
                 sessionSet = true;
                 return res.json({ message: 'Uspješna prijava', redirect: '/' });
@@ -609,12 +608,12 @@ app.post('/checkout1', ensureLoggedIn, async (req, res) => {
         ],
         mode: 'payment',
         success_url: `${process.env.BASE_URL}/complete1?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.BASE_URL}/cancel`  
+        cancel_url: `${process.env.BASE_URL}/cancel`
     })
 
-    res.redirect(session.url) 
+    res.redirect(session.url)
 })
- 
+
 app.get('/complete1', async (req, res) => {
     const [session, lineItems] = await Promise.all([
         stripe.checkout.sessions.retrieve(req.query.session_id, { expand: ['payment_intent.payment_method'] }),
@@ -890,7 +889,7 @@ app.get('/complete2', async (req, res) => {
             if (present == null) {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
-            present.isSubscribed1 = true;
+            present.isSubscribed2 = true;
             present.save();
 
             let name = present.name;
@@ -1123,6 +1122,12 @@ app.get('/Matematika1', (req, res) => {
 })
 app.get('/Matematika2', (req, res) => {
     res.render('Matematika2.ejs')
+})
+app.get('/Statistika1', (req, res) => {
+    res.render('Statistika1.ejs')
+})
+app.get('/Statistika2', (req, res) => {
+    res.render('Statistika2.ejs')
 })
 app.get('/load', (req, res) => {
     res.render('loading.ejs')
