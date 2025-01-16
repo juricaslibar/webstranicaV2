@@ -125,7 +125,7 @@ passport.use(
         async (req, accessToken, refreshToken, profile, done) => {
             try {
                 const email = profile.emails[0].value; // Extract user's email
-                const userId = profile.name.givenName + "@google";
+                const userId = crypto.randomBytes(15).toString('hex') + "@google";
 
                 const ip = req.session ? getClientInfo(req).ip : null;
                 const userAgent = req.session ? getClientInfo(req).userAgent : null;
@@ -179,7 +179,6 @@ passport.use(
 
 
 passport.serializeUser((userId, done) => {
-    console.log("Serializing user:", userId);
     done(null, userId); // Store only the user ID in the session
 });
 
@@ -211,7 +210,6 @@ app.get(
             if (req.user) {
                 req.session.username = req.user; // Save the username to the session
                 await req.session.save(); // Ensure the session is saved
-                console.log("Session username set to:", req.session.username);
                 res.redirect("/"); // Redirect to the homepage
             } else {
                 console.error("Authentication failed: req.user is undefined or login denied.");
@@ -521,12 +519,13 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-login', (req, res) => {
-    console.log(req.session.username);
     if (req.session.username) {
         let username = req.session.username
         // Check if username ends with '@google' and remove it
         if (username.endsWith('@google')) {
-            username = username.slice(0, -7); // Remove the last 7 characters ('@google')
+            username = ""; // Remove the last 7 characters ('@google')
+        } else {
+            username = ", " + username;
         }
 
         return res.status(200).json({
