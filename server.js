@@ -302,7 +302,7 @@ app.post('/api/register', async (req, res) => {
     <p style="word-break: break-word; text-align: center; color: #555;">${url}</p>
     <p>Za dodatne informacije slobodno nas kontaktirajte.</p>
     <p>S poštovanjem,</p>
-    <p><strong>Vaš Tim</strong></p>
+    <p><strong>Stat&Mat</strong></p>
 </div>
 `,
             attachments: [
@@ -401,7 +401,7 @@ app.post('/resend-email', async (req, res) => {
     <p style="word-break: break-word; text-align: center; color: #555;">${url}</p>
     <p>Za dodatne informacije slobodno nas kontaktirajte.</p>
     <p>S poštovanjem,</p>
-    <p><strong>Vaš Tim</strong></p>
+    <p><strong>Stat&Mat</strong></p>
 </div>
 `,
                     attachments: [
