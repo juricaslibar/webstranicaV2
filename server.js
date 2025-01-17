@@ -81,17 +81,6 @@ const decrypt = (text) => {
     return decrypted.toString();
 };
 
-// Get all users
-const readUsers = async () => {
-    try {
-        const users = await User.find();
-        return users;
-    } catch (error) {
-        console.error('Error reading users from the database:', error);
-        return {};
-    }
-};
-
 // Get client IP and user agent
 const getClientInfo = (req) => {
     const ip = req.ip ||
@@ -126,6 +115,7 @@ passport.use(
             try {
                 const email = profile.emails[0].value; // Extract user's email
                 const userId = crypto.randomBytes(15).toString('hex') + "@google";
+                const username = profile.name.givenName;
 
                 const ip = req.session ? getClientInfo(req).ip : null;
                 const userAgent = req.session ? getClientInfo(req).userAgent : null;
@@ -136,9 +126,11 @@ passport.use(
                 if (!user) {
                     // Create a new user if not found
                     user = new User({
+                        username: username,
                         name: userId,
                         email: email,
                         password: null,
+                        registrationDate: new Date(),
                         isConfirmed: true,
                         isSubscribed1: false,
                         isSubscribed2: false,
@@ -260,9 +252,11 @@ app.post('/api/register', async (req, res) => {
 
         // Store username and device information
         const user = new User({
+            username: username,
             name: username,
             email: email,
             password: password,
+            registrationDate: new Date(),
             isConfirmed: false,
             isSubscribed1: false,
             isSubscribed2: false,
@@ -516,12 +510,13 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
-app.get('/api/check-login', (req, res) => {
+app.get('/api/check-login', async (req, res) => {
     if (req.session.username) {
         let username = req.session.username
         // Check if username ends with '@google' and remove it
         if (username.endsWith('@google')) {
-            username = ""; // Remove the last 7 characters ('@google')
+            const user = await User.findOne({ name: username });
+            username = ", " + user.username;
         } else {
             username = ", " + username;
         }
