@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistika - Prvi Kolokvij (Uskoro)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #2563eb;
+            --background-color: #E8E8E8;
+            --text-color: #1e293b;
+            --card-background: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: var(--card-background);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .coming-soon {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin: 40px 0;
+        }
+
+        .notify-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            letter-spacing: 1px;
+        }
+
+        .notify-button:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .notify-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px;
+                width: 90%;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .coming-soon {
+                font-size: 1.5rem;
+            }
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-link:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 600px) {
+            .logo-image {
+                width: 50px;
+                height: 50px;
+            }
+            .company-name {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <a href="/" class="logo-link">
+                <img src="/sprites/logo.ico" alt="Stat&Mat Logo" class="logo-image">
+                <span class="company-name">Stat&Mat</span>
+            </a>
+        </div>
+        <h1>Statistika - Prvi Kolokvij</h1>
+        
+        <p class="coming-soon">Uskoro dolazi!</p>
+        
+        <p>
+            Pripremamo sveobuhvatni materijal za učenje koji će vam pomoći u savladavanju gradiva 
+            i pripremi za prvi kolokvij iz statistike. Ostanite s nama!
+        </p>
+        
+        <h2>Što možete očekivati?</h2>
+        <p>
+            Detaljne video lekcije, primjere zadataka, i interaktivne vježbe koje će vam pomoći 
+            da s lakoćom savladate gradivo prvog kolokvija iz statistike.
+        </p>
+        
+        <p>
+            Budite među prvima koji će saznati kada sadržaj bude dostupan. 
+            Prijavite se za obavijesti i osigurajte si prednost u učenju!
+        </p>
+
+        <button type="submit" class="notify-button">OBAVIJESTI ME</button>
+    </div>
+</body>
+</html>
+
