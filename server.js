@@ -516,7 +516,9 @@ app.get('/api/check-login', async (req, res) => {
         // Check if username ends with '@google' and remove it
         if (username.endsWith('@google')) {
             const user = await User.findOne({ name: username });
-            username = ", " + user.username;
+            if (user){
+                username = ", " + user.username;
+            }
         } else {
             username = ", " + username;
         }
