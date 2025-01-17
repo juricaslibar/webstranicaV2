@@ -137,7 +137,7 @@ passport.use(
                         devices: [{ ip: encryptedIP, userAgent: userAgent }],
                     });
                     await user.save();
-                    return done(null, userId); // Pass user ID for session
+                    return done(null, user.name); // Pass user ID for session
                 }
 
                 // If the user exists, check device registration
@@ -150,7 +150,7 @@ passport.use(
                     if (user.devices.length >= 2) {
                         // Prevent login if the user tries to register a third device
                         console.warn(
-                            `User ${userId} tried to register a third device. Login denied.`
+                            `User ${user.name} tried to register a third device. Login denied.`
                         );
                         return done(null, false, { message: "Too many devices registered." });
                     }
@@ -160,7 +160,7 @@ passport.use(
                     await user.save();
                 }
 
-                return done(null, userId); // Pass user ID for session
+                return done(null, user.name); // Pass user ID for session
             } catch (error) {
                 console.error("Google login error:", error);
                 return done(error, null);
@@ -516,7 +516,7 @@ app.get('/api/check-login', async (req, res) => {
         // Check if username ends with '@google' and remove it
         if (username.endsWith('@google')) {
             const user = await User.findOne({ name: username });
-            if (user){
+            if (user) {
                 username = ", " + user.username;
             }
         } else {
