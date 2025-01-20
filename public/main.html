@@ -127,7 +127,7 @@
             color: white;
             border-radius: 2rem;
             box-shadow: 0 4px 10px var(--shadow-color);
-            transition: all 0.3s ease;
+            transition: margin-top 0.3s ease, padding 0.3s ease;
         }
 
 
@@ -390,7 +390,7 @@
                 }
 
             .hero {
-                margin-top: 9rem; /* Updated margin-top */
+                margin-top: 9rem; /* Increased from 6rem */
                 padding: 2rem 1rem;
             }
 
@@ -458,6 +458,13 @@
 
             .desktop-only {
                 display: none;
+            }
+
+            body:has(#Matematika_prvi_kol-link:not([style*="display: none"])),
+            body:has(#Matematika_drugi_kol-link:not([style*="display: none"])) {
+                .hero {
+                    margin-top: 12rem; /* Further increased margin for when math links are visible */
+                }
             }
         }
 
@@ -572,7 +579,7 @@
             <div>
                 <p>Imate pitanja ili trebate pomoć?</p>
                 <ul>
-                    <li>E-mail: statandmat@gmail.hr</li>
+                    <li>E-mail: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6211160316030c060f031622050f030b0e4c0a10">[email&#160;protected]</a></li>
                     <li>Whatsapp: +385 98 167 4727</li>
                 </ul>
             </div>
@@ -590,7 +597,7 @@
         </div>
     </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Check if user is logged in
         fetch('/api/check-login')
             .then(response => response.json())
@@ -684,3 +691,4 @@
     </script>
 </body>
 </html>
+
