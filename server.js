@@ -642,7 +642,7 @@ app.get('/complete1', async (req, res) => {
             present.isSubscribed1 = true;
             present.save();
 
-            let name = present.name;
+            let name = present.username;
 
             // Send email
             const mailOptions = {
@@ -882,7 +882,7 @@ app.get('/complete2', async (req, res) => {
             present.isSubscribed2 = true;
             present.save();
             
-            let name = present.name;
+            let name = present.username;
 
             // Send email
             const mailOptions = {
