@@ -643,10 +643,6 @@ app.get('/complete1', async (req, res) => {
             present.save();
 
             let name = present.name;
-            // Check if username ends with '@google' and remove it
-            if (name.endsWith('@google')) {
-                name = name.slice(0, -7); // Remove the last 7 characters ('@google')
-            }
 
             // Send email
             const mailOptions = {
@@ -885,12 +881,8 @@ app.get('/complete2', async (req, res) => {
             }
             present.isSubscribed2 = true;
             present.save();
-
+            
             let name = present.name;
-            // Check if username ends with '@google' and remove it
-            if (name.endsWith('@google')) {
-                name = name.slice(0, -7); // Remove the last 7 characters ('@google')
-            }
 
             // Send email
             const mailOptions = {
