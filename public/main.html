@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stat & Mat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
@@ -127,7 +126,7 @@
             color: white;
             border-radius: 2rem;
             box-shadow: 0 4px 10px var(--shadow-color);
-            transition: margin-top 0.3s ease, padding 0.3s ease;
+            transition: all 0.3s ease;
         }
 
 
@@ -372,7 +371,104 @@
                     color: var(--primary-color);
                 }
 
+        .ask-perplexity {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+
+            .ask-perplexity h2 {
+                text-align: center;
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 1.5rem;
+                color: var(--primary-color);
+            }
+
+        .ask-perplexity-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+            .ask-perplexity-form input {
+                width: 100%;
+                padding: 1rem;
+                border: 2px solid #e2e8f0;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                transition: border-color 0.3s, box-shadow 0.3s;
+            }
+
+                .ask-perplexity-form input:focus {
+                    outline: none;
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                }
+
+            .ask-perplexity-form button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 0.8rem 2rem;
+                border-radius: 2rem;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-top: 1rem;
+            }
+
+                .ask-perplexity-form button:hover {
+                    background-color: var(--secondary-color);
+                    transform: translateY(-2px);
+                }
+
+        #responseArea {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.25rem;
+            white-space: pre-wrap;
+        }
+
+        /* Loading animation */
+        .loader {
+            display: none;
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--primary-color);
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg)
+            }
+
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
         @media (max-width: 768px) {
+            .ask-perplexity-form {
+                flex-direction: column;
+            }
+
+                .ask-perplexity-form input,
+                .ask-perplexity-form button {
+                    width: 100%;
+                    max-width: none;
+                }
+
             .header-container {
                 flex-direction: column;
                 align-items: center;
@@ -390,7 +486,7 @@
                 }
 
             .hero {
-                margin-top: 9rem; /* Increased from 6rem */
+                margin-top: 9rem; /* Updated margin-top */
                 padding: 2rem 1rem;
             }
 
@@ -459,13 +555,6 @@
             .desktop-only {
                 display: none;
             }
-
-            body:has(#Matematika_prvi_kol-link:not([style*="display: none"])),
-            body:has(#Matematika_drugi_kol-link:not([style*="display: none"])) {
-                .hero {
-                    margin-top: 13rem; /* Further increased margin for when math links are visible */
-                }
-            }
         }
 
         @media (max-width: 480px) {
@@ -495,6 +584,7 @@
     </style>
 </head>
 <body>
+
     <header>
         <div class="header-container">
             <a href="/" class="logo">
@@ -522,6 +612,7 @@
         </div>
     </div>
 
+
     <div class="subscription-container">
         <div class="plan-box">
             <h3>Matematika - prvi kolokvij</h3>
@@ -543,6 +634,18 @@
             <button onclick="window.location.href='/Statistika2'">Saznaj više</button>
         </div>
     </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Move and style the Ask Perplexity section -->
+    <section class="ask-perplexity">
+        <h2>Pitaj AI za pomoć</h2>
+        <div class="ask-perplexity-form">
+            <input type="text" id="promptInput" placeholder="Upiši poruku">
+            <button id="askButton">Pitaj</button>
+        </div>
+        <div id="responseArea"></div>
+    </section>
 
     <div class="section-divider"></div>
 
@@ -579,7 +682,7 @@
             <div>
                 <p>Imate pitanja ili trebate pomoć?</p>
                 <ul>
-                    <li>E-mail: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6211160316030c060f031622050f030b0e4c0a10">[email&#160;protected]</a></li>
+                    <li>E-mail: statandmat@gmail.hr</li>
                     <li>Whatsapp: +385 98 167 4727</li>
                 </ul>
             </div>
@@ -587,7 +690,6 @@
     </section>
 
     <div class="section-divider"></div>
-
     <footer>
         <p>&copy; 2024 Stat&Mat. Sva prava pridržana.</p>
         <div class="footer-links">
@@ -597,7 +699,7 @@
         </div>
     </footer>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // Check if user is logged in
         fetch('/api/check-login')
             .then(response => response.json())
@@ -688,7 +790,37 @@
                 }
             });
         });
+const askButton = document.getElementById('askButton');
+const promptInput = document.getElementById('promptInput');
+const responseArea = document.getElementById('responseArea');
+
+askButton.addEventListener('click', async () => {
+    const prompt = promptInput.value;
+
+    if (!prompt) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/ask', {  // Use the correct URL for your backend
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        responseArea.textContent = data.response; // Display the response
+    } catch (error) {
+        console.error('Error:', error);
+        responseArea.textContent = 'Error: ' + error.message;
+    }
+});
     </script>
 </body>
 </html>
-
