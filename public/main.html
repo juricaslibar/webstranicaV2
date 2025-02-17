@@ -801,6 +801,8 @@ askButton.addEventListener('click', async () => {
         return;
     }
 
+    responseArea.textContent = "razmišljam...";
+
     try {
         const response = await fetch('/api/ask', {  // Use the correct URL for your backend
             method: 'POST',
@@ -813,7 +815,7 @@ askButton.addEventListener('click', async () => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+        
         const data = await response.json();
         responseArea.textContent = data.response; // Display the response
     } catch (error) {
