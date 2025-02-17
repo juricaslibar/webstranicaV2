@@ -56,6 +56,33 @@ app.use(session({
     }
 }));
 
+const API_KEY = process.env.PERPLEXITY_API_KEY;
+const API_URL = 'https://api.perplexity.ai/chat/completions';
+
+app.post('/api/ask', async (req, res) => {
+    const message = req.body.message;
+
+    try {
+        const response = await axios.post(
+            API_URL,
+            {
+                model: "sonar-pro",
+                messages: [{ role: "user", content: message }] 
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                } 
+            }
+        );
+
+        res.json({ response: response.data.choices[0].message.content }); // Send back the response from Perplexity
+    } catch (error) {
+        console.error('Error:', error.response ? error.response.data : error.message);
+        res.status(500).json({ error: 'Failed to get response from Perplexity' });
+    }
+});
 
 // Encryption setup 
 const ENCRYPTION_KEY = process.env.RANDOM_ENCRYPT; // Store this securely in a real application
@@ -642,7 +669,11 @@ app.get('/complete1', async (req, res) => {
             present.isSubscribed1 = true;
             present.save();
 
-            let name = present.username;
+            let name = present.name;
+            // Check if username ends with '@google' and remove it
+            if (name.endsWith('@google')) {
+                name = name.slice(0, -7); // Remove the last 7 characters ('@google')
+            }
 
             // Send email
             const mailOptions = {
@@ -881,8 +912,12 @@ app.get('/complete2', async (req, res) => {
             }
             present.isSubscribed2 = true;
             present.save();
-            
-            let name = present.username;
+
+            let name = present.name;
+            // Check if username ends with '@google' and remove it
+            if (name.endsWith('@google')) {
+                name = name.slice(0, -7); // Remove the last 7 characters ('@google')
+            }
 
             // Send email
             const mailOptions = {
